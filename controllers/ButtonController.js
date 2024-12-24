@@ -1,0 +1,20 @@
+const {ButtonBuilder, ButtonStyle, ActionRowBuilder} = require('discord.js');
+
+module.exports = class ButtonController {
+    static async SkillDetails(skill1, skill2)
+    {
+        const row = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('skill1Details')
+                    .setLabel(`Detalhes de ${skill1}`)
+                    .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId('skill2Details')
+                    .setLabel(`Detalhes de ${skill2}`)
+                    .setStyle(ButtonStyle.Success),
+            )
+
+        return row;
+    }
+}
