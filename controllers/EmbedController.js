@@ -1,5 +1,6 @@
 const { EmbedBuilder } = require('discord.js');
 const User = require('../models/User');
+const checkSkillType = require('../helpers/checkSkillType');
 
 module.exports = class EmbedController {
     static async ShowUserProfile(discordId, displayImage) {
@@ -44,7 +45,7 @@ module.exports = class EmbedController {
             .setImage(card.image)
             .setColor(card.rarity.color)
             .addFields(
-                { name: `⠀⠀⠀⠀⠀⠀⠀⠀Raridade: ${card.rarity.name}`, value: `⠀`},
+                { name: `⠀⠀⠀⠀⠀⠀⠀⠀ Raridade: ${card.rarity.name}`, value: `⠀`},
             )
             .addFields(
                 {name: 'Descrição', value: `*${card.description}*`}
@@ -57,21 +58,43 @@ module.exports = class EmbedController {
 
             
             .addFields(
-                { name: 'HP', value: `${card.HP}⠀❤️`, inline: true },
-                { name: 'Mana', value: `${card.MANA}⠀🌀`, inline: true },
+                { name: `${card.HP}⠀❤️`, value: `⠀`, inline: true },
+                { name: `${card.MANA}⠀🌀`, value: `⠀`, inline: true },
             )
             
             .addFields(
-                { name: `ATK⠀⠀⠀⠀⠀⠀⠀${card.skill1?.name || "Habilidade 1"}:`, value: `⠀**${card.ATK}**⠀🗡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${card.skill1?.cost || 0}**⠀💠`, },
+                { name: `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀${card.skill1.name}`, value: `**${card.ATK}**⠀🗡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${card.skill1?.cost || 0}**⠀💠`, },
+                { name: `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀${card.skill2.name}:`, value: `**${card.DEF}**⠀🛡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${card.skill2?.cost || 0}**⠀💠`, },
+                { name: `⠀`, value: `**${card.SPEED}**⠀💨`}
             )
-            .addFields(
-                { name: `DEF⠀⠀⠀⠀⠀⠀⠀${card.skill2?.name || "Habilidade 2"}:`, value: `⠀**${card.DEF}**⠀🛡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${card.skill2?.cost || 0}**⠀💠`, },
-                { name: 'SPEED', value: `**⠀${card.SPEED}**⠀🏃`, inline: true }
-            );
     
         return embed;
     }
-    
 
-    // ShowFriendProfile
+    static async ShowSkill(skill) {
+        const skillType = checkSkillType(skill.SkillType, skill.SkillValue, skill.StatusChangeType, skill.SkillMultiplier);
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
+            .setTitle(`⠀⠀⠀⠀⠀⠀⠀⠀🌀⠀${skill.name}⠀🌀`)
+            .setImage(skill.image)
+            .setDescription(`**Descrição:** *${skill.description}*`)
+            .setColor('Gold')
+            .addFields(
+                { name: '⠀⠀', value: `-----------------------------` }
+            )
+            .addFields(
+                {name: `${skill.cost}⠀💠`, value: `⠀`},
+            )   
+            .addFields(
+                {name: skillType, value: `**${skill.hitTimes}⠀👊**`, inline: true },
+            )
+            .addFields(
+                {name: `⠀🎯⠀${skill.acurracy * 100}%`, value: ` **${skill.duration === 0 ? '⠀Instântaneo⠀💥' : '⠀⠀'+ skill.duration + '⠀🕒'}**`, inline: true },
+            )
+           
+        return embed;
+    }
+
+
+    
 }

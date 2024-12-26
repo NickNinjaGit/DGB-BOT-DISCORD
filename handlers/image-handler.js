@@ -46,10 +46,11 @@ async function ConvertGif(gifURL) {
         // Upload da imagem
         const result = await cloudinary.uploader.upload(gifURL);
         console.log('Imagem carregada com sucesso!');
-        console.log('Secure URL:', result.secure_url);
+        // console.log('Secure URL:', result.secure_url);
 
         // Gerar a URL transformada
         const url = cloudinary.url(result.public_id, {
+            format: 'gif',
             transformation: [
                 {
                     width: 555,
@@ -67,12 +68,11 @@ async function ConvertGif(gifURL) {
                 },
             ],
         });
-
+        console.log('URL transformada:', url);
         return url;
     } catch (error) {
         console.error('Erro ao fazer upload da imagem:', error.message);
     }
 }
-
 module.exports = { ConvertImage, ConvertGif };
 

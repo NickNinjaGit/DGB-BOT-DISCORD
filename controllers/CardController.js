@@ -36,18 +36,5 @@ module.exports = class CardController {
         rarity === MYTHIC ? {name: 'Mítico⠀🔴', color: 0xd41c1c} : 
         'Não definida';
     }
-    static async resizeImage(imagePath, width, height) {
-        const canvas = Canvas.createCanvas(width, height);
-        const ctx = canvas.getContext('2d');
     
-        try {
-            const image = await Canvas.loadImage(imagePath);
-            ctx.drawImage(image, 0, 0, width, height);
-            console.log('Imagem redimensionada com sucesso!');
-            return canvas.toBuffer('image/png');
-        } catch (error) {
-            console.error(`Erro ao carregar a imagem local: ${error.message}`);
-            throw error;
-        }
-    }
 }

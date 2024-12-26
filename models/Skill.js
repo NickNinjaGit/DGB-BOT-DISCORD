@@ -65,6 +65,7 @@ const Skill = db.define('skill', {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 0
-    }
+    },
 });
+
 module.exports = Skill;

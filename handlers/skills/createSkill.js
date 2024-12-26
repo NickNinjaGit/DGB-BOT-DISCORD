@@ -4,7 +4,7 @@ const ConvertGif = require('../image-handler').ConvertGif;
 const Skill = require('../../models/Skill');
 const calculateImageHash = require('../../helpers/calculateImageHash');
 
-module.exports = async function createSkill(name, description, isGif, image, cost, SkillType, SkillValue, StatusChangeType, SkillMultiplier, acurracy, hitTimes, duration) {
+module.exports = async function createSkill(name, description, isGif, image, cost, SkillType, SkillValue, StatusChangeType, SkillMultiplier, acurracy, hitTimes, duration, skillOwner) {
     
     // Calcula o hash da imagem
     const hash = await calculateImageHash(image);
@@ -33,6 +33,7 @@ module.exports = async function createSkill(name, description, isGif, image, cos
             acurracy, 
             hitTimes, 
             duration,
+
         });
     return skill;
 }

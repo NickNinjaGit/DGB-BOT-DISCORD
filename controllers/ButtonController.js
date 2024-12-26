@@ -3,7 +3,7 @@ const {ButtonBuilder, ButtonStyle, ActionRowBuilder} = require('discord.js');
 module.exports = class ButtonController {
     static async SkillDetails(skill1, skill2)
     {
-        const row = new ActionRowBuilder()
+        const skillRow = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
                     .setCustomId('skill1Details')
@@ -13,8 +13,24 @@ module.exports = class ButtonController {
                     .setCustomId('skill2Details')
                     .setLabel(`Detalhes de ${skill2}`)
                     .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId('quit')
+                    .setLabel(`Sair`)
+                    .setStyle(ButtonStyle.Danger),
             )
 
-        return row;
+        const backRow = new ActionRowBuilder()
+            .addComponents(
+                new ButtonBuilder()
+                    .setCustomId('back')
+                    .setLabel('Voltar')
+                    .setStyle(ButtonStyle.Success),
+                new ButtonBuilder()
+                    .setCustomId('quit')
+                    .setLabel(`Sair`)
+                    .setStyle(ButtonStyle.Danger),
+            )
+
+        return {skillRow, backRow};
     }
 }

@@ -1,9 +1,4 @@
-const {
-  Client,
-  Events,
-  GatewayIntentBits,
-  SlashCommandBuilder,
-} = require("discord.js");
+const {Client, Events, GatewayIntentBits, SlashCommandBuilder, Message } = require("discord.js");
 
 // controllers
 const EmbedController = require("../controllers/EmbedController");
@@ -12,9 +7,11 @@ const CardController = require("../controllers/CardController");
 // helpers
 const IsRegisteredUser = require("../helpers/IsRegisteredUser");
 const { IsAdmin } = require("../helpers/isAdmin");
+
+// interaction list
+const interactionList = require("../handlers/interaction/interactionList");
 async function handleInteraction(interaction) {
-  const userId = interaction.user.id;
-  const userImage = interaction.user.displayAvatarURL();
+
   const commandName = interaction.commandName;
 
   if (!interaction.isChatInputCommand()) return;
@@ -35,90 +32,23 @@ async function handleInteraction(interaction) {
       return;
     }
 
+    // Slash commands interactions
     switch (commandName) {
+      // my-profile command
       case "my-profile":
-        const myProfileEmbed = await EmbedController.ShowUserProfile(
-          userId,
-          userImage
-        );
-        await interaction.reply({ embeds: [myProfileEmbed] });
-        return;
+        await interactionList.myProfile(interaction);
+        break;
+      // friend-profile command
       case "friend-profile":
-        // Obtém o usuário selecionado
-        const selectedUser = interaction.options.getUser("user");
-
-        // Verifica se o usuário é um bot
-        if (selectedUser.bot) {
-          await interaction.reply({
-            content: "Bots não possuem contas, seu engraçadinho.",
-            ephemeral: true,
-          });
-          break;
-        }
-
-        // Verifica se o usuário está registrado
-        const friendRegistered = await IsRegisteredUser(
-          selectedUser.id,
-          selectedUser.username
-        );
-
-        if (!friendRegistered) {
-          // Se o amigo não tiver conta
-          await interaction.reply({
-            content: "O usuário selecionado ainda não possui uma conta.",
-            ephemeral: true,
-          });
-        } else {
-          // Se o amigo tiver conta, exibe o perfil
-          const friendProfileEmbed = await EmbedController.ShowUserProfile(
-            selectedUser.id,
-            selectedUser.displayAvatarURL()
-          );
-          await interaction.reply({
-            embeds: [friendProfileEmbed],
-            ephemeral: true,
-          });
-        }
+        await interactionList.friendProfile(interaction);
         break;
       case "f-card":
-        try {
-          const cardName = interaction.options.getString("card");
-          const card = await CardController.getCardByName(cardName);
-
-          if (!card) {
-            await interaction.reply({
-              content: "Card não encontrado!",
-              ephemeral: true,
-            });
-            return;
-          }
-          console.log(card);
-
-          const cardEmbed = await EmbedController.ShowCard(card);
-          const SkillDetails = await ButtonController.SkillDetails(card.skill1.name, card.skill2.name);
-          await interaction.reply({ embeds: [cardEmbed], components: [SkillDetails] });
-        } catch (error) {
-          console.error("Erro ao buscar ou exibir o card:", error);
-          await interaction.reply({
-            content: "Ocorreu um erro ao processar o card.",
-            ephemeral: true,
-          });
-        }
+      await interactionList.findCard(interaction);
         break;
-    }
-
-    // Comandos de Admin (descomentado caso necessário)
-    /*
-        const isAdminUser = await IsAdmin(interaction.user.id);
-        if (isAdminUser && commandName === 'test') {
-            await interaction.editReply({ content: "Teste ADM sucesso!" });
-            return;
-        } else {
-            await interaction.editReply({ content: "Você não tem permissão para executar esse comando." });
-        }
-        */
-
-    // Outras lógicas de comando podem ir aqui...
+      case "test":
+      await interactionList.testAdmin(interaction);
+        break;
+    } 
   } catch (error) {
     console.error("Erro ao processar a interação:", error);
 
