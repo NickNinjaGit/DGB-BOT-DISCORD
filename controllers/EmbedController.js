@@ -16,7 +16,7 @@ module.exports = class EmbedController {
                 { name: 'Informações 📜', value: `────୨ৎ────`},
             )
             .addFields(
-                { name: 'Cartas Colecionadas 🃏', value: `0/100 `, inline: true },
+                { name: 'Cartas Colecionades 🃏', value: `0/100 `, inline: true },
                 { name: 'Dinheiro 💰', value: `${user.wallet} 💸  `, inline: true },
                 { name: 'Inventario 🎒', value: `${user.inventory} /${user.inventoryLimit} `, inline: true },
                 
