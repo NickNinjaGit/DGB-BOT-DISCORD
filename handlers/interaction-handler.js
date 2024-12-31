@@ -1,15 +1,8 @@
-const {Client, Events, GatewayIntentBits, SlashCommandBuilder, Message } = require("discord.js");
-
-// controllers
-const EmbedController = require("../controllers/EmbedController");
-const ButtonController = require("../controllers/ButtonController");
-const CardController = require("../controllers/CardController");
-// helpers
-const IsRegisteredUser = require("../helpers/IsRegisteredUser");
-const { IsAdmin } = require("../helpers/isAdmin");
-
 // interaction list
 const interactionList = require("../handlers/interaction/interactionList");
+// helpers
+const IsRegisteredUser = require("../helpers/IsRegisteredUser");
+const wait = require("node:timers/promises").setTimeout;
 async function handleInteraction(interaction) {
 
   const commandName = interaction.commandName;
@@ -29,6 +22,8 @@ async function handleInteraction(interaction) {
         content:
           "Boas-vindas ao Gacha Battle Bot! Sua conta foi criada com sucesso!",
       });
+      await wait(3000);
+      await interaction.deleteReply();
       return;
     }
 
@@ -37,6 +32,9 @@ async function handleInteraction(interaction) {
       // my-profile command
       case "my-profile":
         await interactionList.myProfile(interaction);
+        break;
+      case "work":
+        await interactionList.Work(interaction);
         break;
       // friend-profile command
       case "friend-profile":

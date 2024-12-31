@@ -16,6 +16,9 @@ module.exports = [
     // Shop list Command
     // Buy Item Command
     // Work Command (Get Coins)
+    new SlashCommandBuilder()
+        .setName('work')
+        .setDescription('Trabalhe para ganhar uma quantidade de moedas'),
     // Daily Command (Get Coins)
     // User Profile Command
     new SlashCommandBuilder()

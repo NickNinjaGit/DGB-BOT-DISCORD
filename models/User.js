@@ -16,6 +16,16 @@ const User = db.define("user", {
     type: DataTypes.INTEGER,
     defaultValue: 50,
   },
+  Daily: {
+    type: DataTypes.BOOLEAN,
+    required: true,
+    defaultValue: false,
+  },
+  alreadyWorked: {
+    type: DataTypes.BOOLEAN,
+    required: true,
+    defaultValue: false,
+  },
   inventory: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
@@ -37,11 +47,6 @@ const User = db.define("user", {
     defaultValue: 0,
   },
   IsInBattle: {
-    type: DataTypes.BOOLEAN,
-    required: true,
-    defaultValue: false,
-  },
-  Daily: {
     type: DataTypes.BOOLEAN,
     required: true,
     defaultValue: false,

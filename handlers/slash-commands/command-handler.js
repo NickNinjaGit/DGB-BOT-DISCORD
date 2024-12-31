@@ -5,7 +5,7 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 // deleting commands
 function registerCommands() {
-  rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commandList})
+  rest.put(Routes.applicationCommands(process.env.CLIENT_ID), {body: commandList})
     .then(() => console.log('Successfully registered application commands.'))
     .catch(console.error);
 }

@@ -34,7 +34,7 @@ client.once(Events.ClientReady, async (c) => {
   try {
     await conn.authenticate();
     await conn.sync();
-    //await conn.sync({ force: true });
+    // await conn.sync({ force: true });
     await loadCardCollection();
 
     console.log("Connected to database!");
