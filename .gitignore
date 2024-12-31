@@ -3,6 +3,7 @@
 
 ### dotenv ###
 .env
+./db/conn.js
 
 ### Node ###
 # Logs
