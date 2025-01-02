@@ -41,8 +41,8 @@ client.once(Events.ClientReady, async (c) => {
   } catch (error) {
     console.log("An error occurred while connecting to the database:", error);
   }
-  CommandHandler.registerCommands();
-  // CommandHandler.deleteCommands();
+  //CommandHandler.registerCommands();
+  CommandHandler.deleteCommands();
 });
 
 client.on(
