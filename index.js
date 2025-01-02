@@ -19,6 +19,9 @@ const Skill = require("./models/Skill");
 const handleInteraction = require("./handlers/interaction-handler.js");
 const loadCardCollection = require("./handlers/cards/cardList");
 
+// logger
+const logger = require("./logger")
+
 // Client settings
 const client = new Client({
   intents: [
@@ -27,23 +30,30 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
-
 // Client init
 client.once(Events.ClientReady, async (c) => {
-  console.log(`Ready! Logged in as ${c.user.tag}`);
+  logger.info(`Ready! Logged in as ${c.user.tag}`);
+
   try {
     await conn.authenticate();
     await conn.sync();
-    // await conn.sync({ force: true });
     await loadCardCollection();
 
-    console.log("Connected to database!");
+    logger.info("Conexão com o banco de dados estabelecida com sucesso!");
   } catch (error) {
-    console.log("An error occurred while connecting to the database:", error);
+    logger.error("Erro ao conectar ao banco de dados:", error);
   }
+<<<<<<< HEAD
   //CommandHandler.registerCommands();
   CommandHandler.deleteCommands();
+=======
+
+  CommandHandler.registerCommands();
+>>>>>>> master
 });
+
+// logs gerais
+logger.info("Aplicação iniciada com sucesso!");
 
 client.on(
   Events.InteractionCreate,

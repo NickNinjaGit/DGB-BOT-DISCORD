@@ -4,8 +4,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+<<<<<<< HEAD
     "start": "node  ./index.js",
     "dev": "nodemon ./index.js"
+=======
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+>>>>>>> master
   },
   "keywords": [],
   "author": "",
@@ -18,6 +23,7 @@
     "dotenv": "^16.4.7",
     "mysql2": "^3.11.5",
     "nodemon": "^3.1.9",
-    "sequelize": "^6.37.5"
+    "sequelize": "^6.37.5",
+    "winston": "^3.17.0"
   }
 }
