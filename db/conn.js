@@ -4,7 +4,7 @@ const conn = new Sequelize({
     dialect: 'mysql',
     host: 'localhost',
     username: 'root',
-    password: process.env.DBPASSWORD,
+    password: '',
     database: 'dgbbot_database',
 });
 
