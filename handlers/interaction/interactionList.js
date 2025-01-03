@@ -7,9 +7,12 @@ const isAdmin = require("../../helpers/isAdmin");
 const wait = require("node:timers/promises").setTimeout;
 const path = require("path");
 img_folder = path.resolve(__dirname, "../../images/");
-
+const {AttachmentBuilder} = require('discord.js');
 // models
 const User = require("../../models/User");
+const UserCards = require("../../models/UserCards");
+const Card = require("../../models/Card");
+
 
 /* User Relational interactions */
 async function myProfile(interaction) {
@@ -34,6 +37,8 @@ async function friendProfile(interaction) {
       content: "Bots não possuem contas, seu engraçadinho.",
       ephemeral: true,
     });
+    await wait(1000);
+    interaction.deleteReply();
     return;
   }
 
@@ -50,6 +55,7 @@ async function friendProfile(interaction) {
       content: "O usuário selecionado ainda não possui uma conta.",
       ephemeral: true,
     });
+    await wait(1000);
     interaction.deleteReply();
     return;
   } else {
@@ -66,40 +72,233 @@ async function friendProfile(interaction) {
   }
 }
 
+
+const Work_cooldown = new Map(); // Mapa para rastrear os cooldowns de trabalhos
 async function Work(interaction) {
   const userId = interaction.user.id;
-  const moneyQty = Math.random() * (100 - 10) + 10;
+  const work_gif = new AttachmentBuilder(`${img_folder}/work.gif`); // Certifique-se de que o caminho está correto
+  const minMoney = 10;
+  const maxMoney = 100;
+  const cooldownTime = 3 * 60 * 60 * 1000; // 3 horas em milissegundos
 
-  alreadyWorked = userId.alreadyWorked;
-  if (alreadyWorked) {
-    interaction.reply({
-      content: `Seu expediente acabou! Volte mais tarde!`,
+  // Verifica se o usuário está em cooldown
+  if (Work_cooldown.has(userId)) {
+    const remainingTime = Work_cooldown.get(userId) - Date.now();
+    if (remainingTime > 0) {
+      const hours = Math.floor((remainingTime / 1000) / 3600);
+      const minutes = Math.floor((remainingTime / 1000) / 60);
+      const seconds = Math.floor((remainingTime / 1000) % 60);
+      interaction.reply({
+        content: `Você já trabalhou! Volte em **${hours} horas, ${minutes} minutos e ${seconds} segundos.**`,
+        ephemeral: true,
+      });
+      await wait(3000);
+      interaction.deleteReply();
+      return 
+    }
+  }
+
+  const moneyQty = Math.random() * (maxMoney - minMoney) + minMoney;
+
+  // Atualiza os dados do usuário no banco
+  const user = await User.findOne({ where: { discordID: userId } });
+  user.wallet += moneyQty;
+  await user.save();
+
+  // Define o cooldown
+  Work_cooldown.set(userId, Date.now() + cooldownTime);
+
+  // Responde ao comando
+  await interaction.reply({
+    content: `Você ganhou ${moneyQty.toFixed(0)} 💸! Volte daqui 3 horas para trabalhar de novo!`,
+    files: [work_gif],
+    ephemeral: true,
+  });
+  await wait(3000);
+  interaction.deleteReply();
+
+  // Envia DM ao usuário após o cooldown
+  setTimeout(() => {
+    interaction.user.send({
+      content: `Você já pode trabalhar de novo, vagabundo!`,
+    });
+    Work_cooldown.delete(userId); // Remove o usuário do cooldown após 3 horas
+  }, cooldownTime);
+}
+
+const Daily_cooldown = new Map(); // Mapa para rastrear os cooldowns de dinheiro diario
+async function Daily(interaction) {
+  const userId = interaction.user.id;
+  const daily_gif = new AttachmentBuilder(`${img_folder}/daily.gif`); // Certifique-se de que o caminho está correto
+  minMoney = 50;
+  maxMoney = 250;
+  const moneyQty = Math.random() * (maxMoney - minMoney) + minMoney;
+  const cooldownTime = 24 * 60 * 60 * 1000; // 24 horas em milissegundos
+
+  // Verifica se o usuário está em cooldown
+  if (Daily_cooldown.has(userId)) {
+    const remainingTime = Daily_cooldown.get(userId) - Date.now();
+    if (remainingTime > 0) {
+      const hours = Math.floor((remainingTime / 1000) / 3600);
+      const minutes = Math.floor((remainingTime / 1000) / 60);
+      const seconds = Math.floor((remainingTime / 1000) % 60);
+      interaction.reply({
+        content: `Você já coletou seu Daily! Volte em **${hours} horas, ${minutes} minutos e ${seconds} segundos.**`,
+        ephemeral: true,
+      });
+      await wait(3000);
+      interaction.deleteReply();
+      return;
+    }
+    
+  }
+  // Atualiza os dados do usuário no banco
+  const user = await User.findOne({ where: { discordID: userId } });
+  user.wallet += moneyQty;
+  await user.save();
+
+  // Define o cooldown
+  Daily_cooldown.set(userId, Date.now() + cooldownTime);
+
+  // Responde ao comando
+  await interaction.reply({
+    content: `**Você ganhou ${moneyQty.toFixed(0)} 💸! Volte amanhã para coletar seu daily de novo!**`,
+    ephemeral: true,
+    files: [daily_gif],
+  });
+  await wait(3000);
+  interaction.deleteReply();
+
+  // Envia DM ao usuário após o cooldown
+  setTimeout(() => {
+    interaction.user.send({
+      content: `Você já pode resgatar seu daily novamente!`,
+    });
+    Daily_cooldown.delete(userId); // Remove o usuário do cooldown após 3 horas
+  }, cooldownTime);
+}
+
+async function Shop(interaction) {
+  const userId = interaction.user.id;
+  //get all cards from collection
+
+  const cardList = await CardController.getAllCards();
+  
+  // setting cards pagination to shop
+  let pageId = 1;
+
+  const ItensPerPage = 3;
+  const totalPages = Math.ceil(cardList.length / ItensPerPage);
+
+  let cardsPerPage = await CardController.getCardsPerPage(
+    pageId,
+    ItensPerPage,
+    cardList
+  )
+
+
+  // setting embed & buttons
+  let shopEmbed = await EmbedController.ShowShop(cardsPerPage, pageId, totalPages);
+  const shopButtons = await ButtonController.ShopButtons();
+  await interaction.reply({
+    embeds: [shopEmbed],
+    ephemeral: true,
+    components: [shopButtons],
+  });
+
+  // setting collector
+  const collector = interaction.channel.createMessageComponentCollector({
+    filter: (i) => i.user.id === userId,
+    time: 24 * 60 * 60 * 1000, // 1 dia
+  });
+
+  // handling buttons
+  collector.on("collect", async (i) => {
+    // se o botao for next, muda para a proxima pagina
+    if (i.customId === "next") {
+      pageId = pageId >= totalPages ? 1 : pageId + 1; // Volta para a primeira página se for a última
+
+      cardsPerPage = await CardController.getCardsPerPage(
+        pageId,
+        ItensPerPage,
+        cardList
+      )
+      shopEmbed = await EmbedController.ShowShop(cardsPerPage, pageId, totalPages);
+      await i.update({
+        embeds: [shopEmbed],
+        ephemeral: true,
+        components: [shopButtons],
+      });
+      
+        
+    }
+    // se o botao for previous, muda para a pagina anterior
+    else if (i.customId === "previous") {
+      pageId = pageId === 1 ? pageId = totalPages : pageId = pageId - 1; // se a pagina for menor que 1, volta para a ultima
+      cardsPerPage = await CardController.getCardsPerPage(
+        pageId,
+        ItensPerPage,
+        cardList
+      )
+      shopEmbed = await EmbedController.ShowShop(cardsPerPage, pageId, totalPages);
+      await i.update({
+        embeds: [shopEmbed],
+        ephemeral: true,
+        components: [shopButtons],
+      });
+    }
+    if (i.customId === "quit") {
+      await i.update({
+        content: "Saida realizada com sucesso.",
+        embeds: [],
+        components: [],
+        ephemeral: true,
+      });
+      await wait(1000);
+      await i.deleteReply();
+    }
+  });
+}
+
+async function BuyCard(interaction) {
+  const userId = interaction.user.id;
+  const cardName = interaction.options.getString("card");
+  const user = await User.findOne({ where: { discordID: userId } });
+  const card = await CardController.getCardByName(cardName);
+
+  // check if card exists
+  if (!card) {
+    await interaction.reply({
+      content: "Card nao encontrado!",
       ephemeral: true,
     });
     await wait(3000);
     interaction.deleteReply();
     return;
   }
-  const user = await User.findOne({ where: { discordID: userId } });
-  user.wallet += moneyQty;
-  user.alreadyWorked = true;
+
+  // check if user has enough money
+  if (user.wallet < card.price) {
+    await interaction.reply({
+      content: "Dinheiro insuficiente!",
+      ephemeral: true,
+    });
+    await wait(3000);
+    interaction.deleteReply();
+    return;
+  }
+
+  
+  // buy card
+  await CardController.BuyCard(userId, cardName);
+  user.wallet -= card.price;
   await user.save();
   await interaction.reply({
-    content: `Voce ganhou ${moneyQty.toFixed(
-      0
-    )} 💸, volte daqui 3 horas para trabalhar de novo!`,
-    file: `${img_folder}/work.gif`,
+    content: `Compra realizada com sucesso! Use /f-user-cards para ver sua nova carta!`,
     ephemeral: true,
   });
   await wait(3000);
   interaction.deleteReply();
-  await wait(10000); // 3 horas 10800000
-  user.alreadyWorked = false;
-  await user.save();
-  // send dm to user who used command
-  interaction.user.send({
-    content: `Você já pode trabalhar de novo vabagundo!`,
-  });
 }
 
 /* Card Relational interactions */
@@ -185,20 +384,69 @@ async function findCard(interaction) {
 }
 
 /* Admin Relational interactions */
-async function testAdmin(interaction) {
-  // se retornar falso para este id, barra o usuário.
+async function addCash(interaction) {
   const userId = interaction.user.id;
   const Isadmin = await isAdmin(userId);
+ 
   if (Isadmin === false) {
     interaction.reply({
-      content: "Voce não tem permissao para executar esse comando",
+      content: "Você não tem permissão para executar esse comando",
       ephemeral: true,
     });
+    await wait(3000);
+    interaction.deleteReply();
     return;
   }
-  interaction.reply("Teste de admin executado com sucesso!", {
-    ephemeral: true,
-  });
+  // get money to give and target user
+  const targetUser = interaction.options.getUser("user");
+  if(targetUser.bot) {
+    interaction.reply({
+      content: "Bots não podem receber dinheiro",
+      ephemeral: true,
+    });
+    await wait(3000);
+    interaction.deleteReply();
+    return;
+  }
+  const moneyQty = interaction.options.getInteger("cash");
+  const user = await User.findOne({ where: { discordID: targetUser.id } });
+  user.wallet += moneyQty;
+  await user.save();
+  interaction.reply(`✅⠀**Você adicionou ${moneyQty} 💸 para o usuário ${targetUser.username}**⠀✅`);
+  await wait(3000);
+  interaction.deleteReply();
+}
+async function removeCash(interaction) {
+  const userId = interaction.user.id;
+  const Isadmin = await isAdmin(userId);
+ 
+  if (Isadmin === false) {
+    interaction.reply({
+      content: "Você não tem permissão para executar esse comando",
+      ephemeral: true,
+    });
+    await wait(3000);
+    interaction.deleteReply();
+    return;
+  }
+  // get money to give and target user
+  const targetUser = interaction.options.getUser("user");
+  if(targetUser.bot) {
+    interaction.reply({
+      content: "Bots não podem receber dinheiro",
+      ephemeral: true,
+    });
+    await wait(3000);
+    interaction.deleteReply();
+    return;
+  }
+  const moneyQty = interaction.options.getInteger("cash");
+  const user = await User.findOne({ where: { discordID: targetUser.id } });
+  user.wallet -= moneyQty;
+  await user.save();
+  interaction.reply(`❌⠀**Você removeu ${moneyQty} 💸 para o usuário ${targetUser.username}**⠀❌`);
+  await wait(3000);
+  interaction.deleteReply();
 }
 
-module.exports = { myProfile, friendProfile, Work, findCard, testAdmin };
+module.exports = { myProfile, friendProfile, Work, Daily, Shop, BuyCard, findCard, addCash, removeCash };

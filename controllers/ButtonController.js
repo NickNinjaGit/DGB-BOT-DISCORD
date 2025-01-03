@@ -33,4 +33,23 @@ module.exports = class ButtonController {
 
         return {skillRow, backRow};
     }
+    static async ShopButtons()
+    {
+        const shopRow = new ActionRowBuilder()
+        .addComponents(
+            new ButtonBuilder()
+                .setCustomId('previous')
+                .setLabel(`<-`)
+                .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+                .setCustomId('next')
+                .setLabel(`->`)
+                .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+                .setCustomId('quit')
+                .setLabel(`Sair`)
+                .setStyle(ButtonStyle.Danger),
+        )
+        return shopRow
+    }
 }

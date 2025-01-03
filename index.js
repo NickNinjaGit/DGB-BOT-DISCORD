@@ -16,7 +16,7 @@ const User = require("./models/User");
 const UserCards = require("./models/UserCards");
 const Skill = require("./models/Skill");
 // handlers
-const handleInteraction = require("./handlers/interaction-handler.js");
+const handleInteraction = require("./handlers/interaction/interaction-handler.js");
 const loadCardCollection = require("./handlers/cards/cardList");
 
 // logger
@@ -36,20 +36,16 @@ client.once(Events.ClientReady, async (c) => {
 
   try {
     await conn.authenticate();
-    await conn.sync();
+    await conn.sync({ force: false });
     await loadCardCollection();
 
     logger.info("Conexão com o banco de dados estabelecida com sucesso!");
   } catch (error) {
     logger.error("Erro ao conectar ao banco de dados:", error);
   }
-<<<<<<< HEAD
-  //CommandHandler.registerCommands();
-  CommandHandler.deleteCommands();
-=======
 
   CommandHandler.registerCommands();
->>>>>>> master
+  //CommandHandler.deleteCommands();
 });
 
 // logs gerais

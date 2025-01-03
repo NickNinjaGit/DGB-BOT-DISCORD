@@ -1,5 +1,5 @@
 const {SlashCommandBuilder} = require('discord.js');
-
+const CardController = require('../../controllers/CardController');
 module.exports = [
     /* Cards relational commands */
     // Open Package Command (Package Type, Package Quantity)
@@ -8,18 +8,35 @@ module.exports = [
     // Card Details Command
     new SlashCommandBuilder()
         .setName('f-card')
-        .setDescription('Exibe os detalhes de um card.')
+        .setDescription('Exibe os detalhes de um card da colecção.')
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para exibir os detalhes').setRequired(true)),
     // Sell Card Command
 
     /* User relational commands */
     // Shop list Command
-    // Buy Item Command
+    new SlashCommandBuilder()
+        .setName('shop')
+       .setDescription('Exibe a loja do DGB.'),
+    // Buy Card Command
+    new SlashCommandBuilder()
+        .setName('b-card')
+        .setDescription('Compro um item da loja.')            
+        .addStringOption(option => option.setName('card').setDescription('Selecione um card para comprar').setRequired(true)),
+    // Buy Package Command
+    new SlashCommandBuilder()
+        .setName('b-pack')
+        .setDescription('Compra um pacote da loja.')
+        .addStringOption(option => option.setName('pack').setDescription('Selecione um pacote para comprar')),
+        
+
     // Work Command (Get Coins)
     new SlashCommandBuilder()
         .setName('work')
         .setDescription('Trabalhe para ganhar uma quantidade de moedas'),
     // Daily Command (Get Coins)
+    new SlashCommandBuilder()
+        .setName('daily')
+        .setDescription('Resgate todo dia uma quantidade de moedas'),
     // User Profile Command
     new SlashCommandBuilder()
         .setName('my-profile')
@@ -29,17 +46,26 @@ module.exports = [
         .setName('friend-profile')
         .setDescription('Exibe a conta de alguém.')
         .addUserOption(option => option.setName('user').setDescription('Selecione um usuário para exibir o perfil').setRequired(true)),
-        
+    
     // Leaderboards Command
     // Battle Command
 
     /* Admin commands */
     // Add Card Command
+    // Add Cash Command
+    new SlashCommandBuilder()
+        .setName('add-cash')
+        .setDescription('Adicione uma quantidade de moedas. (Commando Admin)')
+        .addIntegerOption(option => option.setName('cash').setDescription('Selecione uma quantidade de moedas para adicionar').setRequired(true))
+        .addUserOption(option => option.setName('user').setDescription('Selecione um usuário para adicionar moedas').setRequired(true)),
+    // Remove Cash Command
+    new SlashCommandBuilder()
+        .setName('remove-cash')
+        .setDescription('Adicione uma quantidade de moedas. (Commando Admin)')
+        .addIntegerOption(option => option.setName('cash').setDescription('Selecione uma quantidade de moedas para adicionar').setRequired(true))
+        .addUserOption(option => option.setName('user').setDescription('Selecione um usuário para adicionar moedas').setRequired(true))
+    
     // Remove Card Command
     // Update Card Command
     // Test Command
-
-    new SlashCommandBuilder()
-        .setName('test')
-        .setDescription('Teste de comandos')
 ];

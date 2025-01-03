@@ -1,7 +1,7 @@
 // interaction list
-const interactionList = require("../handlers/interaction/interactionList");
+const interactionList = require("./interactionList");
 // helpers
-const IsRegisteredUser = require("../helpers/IsRegisteredUser");
+const IsRegisteredUser = require("../../helpers/IsRegisteredUser");
 const wait = require("node:timers/promises").setTimeout;
 async function handleInteraction(interaction) {
 
@@ -29,22 +29,35 @@ async function handleInteraction(interaction) {
 
     // Slash commands interactions
     switch (commandName) {
-      // my-profile command
+      // user relational commands
       case "my-profile":
         await interactionList.myProfile(interaction);
         break;
       case "work":
         await interactionList.Work(interaction);
         break;
-      // friend-profile command
+      case "daily":
+        await interactionList.Daily(interaction);
+        break;
+      case "shop":
+        await interactionList.Shop(interaction);
+        break;
+      case "b-card":
+        await interactionList.BuyCard(interaction);
+        break;
       case "friend-profile":
         await interactionList.friendProfile(interaction);
         break;
+      // card relational commands
       case "f-card":
       await interactionList.findCard(interaction);
         break;
-      case "test":
-      await interactionList.testAdmin(interaction);
+      // admin relational commands
+      case "add-cash":
+      await interactionList.addCash(interaction);
+        break;
+      case "remove-cash":
+        await interactionList.removeCash(interaction);
         break;
     } 
   } catch (error) {

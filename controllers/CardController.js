@@ -1,6 +1,6 @@
 const Card = require('../models/Card');
 const Skill = require('../models/Skill');
-
+const UserCards = require('../models/UserCards');
 
 module.exports = class CardController {
     static async getCardByName(name)
@@ -21,7 +21,34 @@ module.exports = class CardController {
             skill2: skill2 ? skill2.dataValues : null, // Inclui os campos da skill2 no objeto
         };
     }
-
+    static async getAllCards() {
+        const cards = await Card.findAll({
+            order: [
+                ['id', 'ASC'],
+                ['name', 'ASC'],
+            ],
+        });
+    
+        // Convertendo os resultados para garantir que podemos mapear sobre eles
+        const processedCards = await Promise.all(
+            cards.map(async (cardInstance) => {
+                // cardInstance é o objeto retornado pelo Sequelize, então precisamos acessar o `dataValues`
+                const rarity_info = await CardController.checkRarity(cardInstance.rarity);
+                return {
+                    ...cardInstance.dataValues, // Inclui os campos do card no objeto
+                    rarity: rarity_info,
+                };
+            })
+        );
+    
+        return processedCards;
+    }
+    
+    static async getCardsPerPage(pageId, ItensPerPage, cards) {
+        const startIndex = (pageId - 1) * ItensPerPage;
+        const endIndex = startIndex + ItensPerPage;
+        return cards.slice(startIndex, endIndex); // Retorna um array de itens
+    }
     static async checkRarity(rarity)
     {
         const COMMON = "common";
@@ -35,6 +62,23 @@ module.exports = class CardController {
         rarity === LEGENDARY ? {name: 'Lendário⠀🟠', color: 0xed6905} : 
         rarity === MYTHIC ? {name: 'Mítico⠀🔴', color: 0xd41c1c} : 
         'Não definida';
+    }
+
+    static async BuyCard(userId, cardName)
+    {
+        const card = await Card.findOne({where: {name: cardName}});
+        const userCard = await UserCards.create({
+            userId: userId,
+            cardId: card.id,
+            quantity: 1,
+            currentHP: card.HP,
+            currentATK: card.ATK,
+            currentDEF: card.DEF,
+            currentSPEED: card.SPEED
+
+        })
+        return userCard;
+
     }
     
 }

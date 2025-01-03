@@ -38,6 +38,42 @@ module.exports = class EmbedController {
             )
         return embed;
     }
+    static async ShowShop(cards, pageId, totalPages) {
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: "⠀⠀⠀⠀⠀⠀"})
+            .setTitle(`Loja ⚔️`)
+            .addFields(
+                { name: '⠀', value: `⠀`},
+            )
+            .addFields(
+                { name: 'Pacotes', value: `────୨ৎ────`},
+            )
+            .addFields(
+                { name: '📦⠀Pacote Básico:⠀50⠀💸', value: `*Descrição: Esse pacote pode vir com 5 cartas de raridades baixas (Comum, Raro, Épico)*`},
+                { name: '────୨ৎ────', value: `⠀`},
+                { name: 'Pacote Avançado⠀150⠀💸', value: `*Descrição: O pacote avançado conta com 10 cartas excluindo apenas a raridade Mítica*`},
+                { name: '────୨ৎ────', value: `⠀`},
+                { name: 'Pacote Premium⠀300⠀💸', value: `*Descrição: O pacote premium conta com 20 cartas contendo todas as raridades*`},
+            )
+            .addFields(
+                { name: '⠀', value: `⠀`},
+            )
+            .addFields(
+                { name: '=====================================', value: `⠀`}
+            )
+            .addFields(
+                { name: 'Cartas', value: `────୨ৎ────`},
+            )
+            .setFooter({text: `Página ${pageId}/${totalPages}`});
+        cards.forEach(card => {
+            embed.addFields(
+                { name: `🃏⠀${card.name}:⠀${card.price}⠀💸`, value: `*Descrição: ${card.description}*`},
+                { name: 'Raridade', value: `${card.rarity.name}`},
+                { name: '========୨ৎ========', value: `⠀`},
+            )
+        })
+        return embed
+    }
     static async ShowCard(card) {
         const embed = new EmbedBuilder()
             .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
