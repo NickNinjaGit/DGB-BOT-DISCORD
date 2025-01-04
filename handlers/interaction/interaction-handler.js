@@ -1,8 +1,13 @@
 // interaction list
-const interactionList = require("./interactionList");
+const adminInteractions = require("./adminInteractions");
+const userInteractions = require("./userInteractions");
+const cardInteractions = require("./cardInteractions");
 // helpers
 const IsRegisteredUser = require("../../helpers/IsRegisteredUser");
 const wait = require("node:timers/promises").setTimeout;
+
+//active interactions
+const activeInteractions = new Set();
 async function handleInteraction(interaction) {
 
   const commandName = interaction.commandName;
@@ -22,7 +27,7 @@ async function handleInteraction(interaction) {
         content:
           "Boas-vindas ao Gacha Battle Bot! Sua conta foi criada com sucesso!",
       });
-      await wait(3000);
+      await wait(1000);
       await interaction.deleteReply();
       return;
     }
@@ -31,33 +36,40 @@ async function handleInteraction(interaction) {
     switch (commandName) {
       // user relational commands
       case "my-profile":
-        await interactionList.myProfile(interaction);
-        break;
-      case "work":
-        await interactionList.Work(interaction);
-        break;
-      case "daily":
-        await interactionList.Daily(interaction);
-        break;
-      case "shop":
-        await interactionList.Shop(interaction);
-        break;
-      case "b-card":
-        await interactionList.BuyCard(interaction);
+        await userInteractions.myProfile(interaction, activeInteractions);
         break;
       case "friend-profile":
-        await interactionList.friendProfile(interaction);
+        await userInteractions.friendProfile(interaction);
         break;
+      case "work":
+        await userInteractions.Work(interaction);
+        break;
+      case "daily":
+        await userInteractions.Daily(interaction);
+        break;
+      case "shop":
+        await userInteractions.Shop(interaction, activeInteractions);
+        break;
+      case "b-card":
+        await cardInteractions.BuyCard(interaction);
+        break;
+      case "b-pack":
+        await cardInteractions.BuyPack(interaction);
+        break;
+      
       // card relational commands
       case "f-card":
-      await interactionList.findCard(interaction);
+      await cardInteractions.findCard(interaction, activeInteractions);
+        break;
+      case "fu-card":
+      await cardInteractions.findUserCard(interaction, activeInteractions);
         break;
       // admin relational commands
       case "add-cash":
-      await interactionList.addCash(interaction);
+      await adminInteractions.addCash(interaction);
         break;
       case "remove-cash":
-        await interactionList.removeCash(interaction);
+        await adminInteractions.removeCash(interaction);
         break;
     } 
   } catch (error) {

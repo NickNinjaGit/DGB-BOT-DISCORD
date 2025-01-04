@@ -1,11 +1,11 @@
 module.exports = function checkSkillType(skillType, skillValue, StatusChangeType, SkillMultiplier) {
     if (skillType === 'DAMAGE')
     {
-        return `${skillValue}🗡️`;
+        return `${skillValue}🔥`;
     }
     else if (skillType === 'HEAL')
     {
-        return `${skillValue}🩸`;
+        return `${skillValue}🩹`;
     }
     else if (skillType === 'DEBUFF')
     {

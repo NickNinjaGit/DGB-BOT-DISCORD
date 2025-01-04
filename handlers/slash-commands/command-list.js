@@ -1,16 +1,20 @@
 const {SlashCommandBuilder} = require('discord.js');
-const CardController = require('../../controllers/CardController');
 module.exports = [
     /* Cards relational commands */
     // Open Package Command (Package Type, Package Quantity)
     // Check User Card List
     // Check Collection Card List
-    // Card Details Command
+    // Find card on collection
     new SlashCommandBuilder()
         .setName('f-card')
         .setDescription('Exibe os detalhes de um card da colecção.')
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para exibir os detalhes').setRequired(true)),
-    // Sell Card Command
+    // Find card on user collection
+    new SlashCommandBuilder()
+        .setName('fu-card')
+        .setDescription('Exibe os detalhes de um card do seu inventário.')
+        .addStringOption(option => option.setName('card').setDescription('Selecione um card para exibir os detalhes').setRequired(true)),
+
 
     /* User relational commands */
     // Shop list Command
@@ -20,15 +24,23 @@ module.exports = [
     // Buy Card Command
     new SlashCommandBuilder()
         .setName('b-card')
-        .setDescription('Compro um item da loja.')            
+        .setDescription('Compra um item da loja.')            
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para comprar').setRequired(true)),
     // Buy Package Command
     new SlashCommandBuilder()
         .setName('b-pack')
         .setDescription('Compra um pacote da loja.')
-        .addStringOption(option => option.setName('pack').setDescription('Selecione um pacote para comprar')),
-        
-
+        .addStringOption(option => 
+            option.setName('pack-name')
+                .setDescription('Selecione um pacote para comprar')
+                .setRequired(true)
+        )
+        .addIntegerOption(option => 
+            option.setName('quantity')
+                .setDescription('Selecione uma quantidade de pacotes para comprar')
+                .setRequired(true)
+        ),
+    
     // Work Command (Get Coins)
     new SlashCommandBuilder()
         .setName('work')

@@ -13,6 +13,7 @@ const conn = require("./db/conn");
 // models
 const Card = require("./models/Card");
 const User = require("./models/User");
+const Package = require("./models/Package");
 const UserCards = require("./models/UserCards");
 const Skill = require("./models/Skill");
 // handlers

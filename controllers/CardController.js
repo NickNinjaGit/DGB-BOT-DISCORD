@@ -1,11 +1,13 @@
 const Card = require('../models/Card');
+const {Op} = require("sequelize");
 const Skill = require('../models/Skill');
+const User = require('../models/User'); 
 const UserCards = require('../models/UserCards');
 
 module.exports = class CardController {
     static async getCardByName(name)
     {
-        const card = await Card.findOne({where: {name}})
+        const card = await Card.findOne({where: {name: {[Op.like]: `%${name}%`}}});
         if (!card) return null;
         
 
@@ -43,6 +45,27 @@ module.exports = class CardController {
     
         return processedCards;
     }
+
+    static async getCardCollection(userId)
+    {
+        const user = await User.findOne({where: {discordID: userId}});
+        // compare cards that user has with all cards
+        const cards = await Card.findAll({
+            order: [
+                ['id', 'ASC'],
+                ['name', 'ASC'],
+            ],
+        }) 
+
+        const userCards = await UserCards.findAll({where: {userId: user.id}});
+
+        const cardsQty = userCards.length;
+
+        const lastCard = cards[cards.length - 1].id;
+
+        return {cardsQty, lastCard};
+        
+    }
     
     static async getCardsPerPage(pageId, ItensPerPage, cards) {
         const startIndex = (pageId - 1) * ItensPerPage;
@@ -64,14 +87,23 @@ module.exports = class CardController {
         'Não definida';
     }
 
-    static async BuyCard(userId, cardName)
+    static async AddCard(discordID, cardName)
     {
+        const user = await User.findOne({where: {discordID}});
         const card = await Card.findOne({where: {name: cardName}});
+        const hasCard = await UserCards.findOne({where: {userId: user.id, cardId: card.id}});
+        if(hasCard)
+        {
+            hasCard.quantity += 1;
+            await hasCard.save();
+            return;
+        }
         const userCard = await UserCards.create({
-            userId: userId,
+            userId: user.id,
             cardId: card.id,
             quantity: 1,
             currentHP: card.HP,
+            currentMANA: card.MANA,
             currentATK: card.ATK,
             currentDEF: card.DEF,
             currentSPEED: card.SPEED

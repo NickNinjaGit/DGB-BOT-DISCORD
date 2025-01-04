@@ -46,18 +46,8 @@ const User = db.define("user", {
     required: true,
     defaultValue: false,
   },
-  BasicPackageQty: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-  },
-  AdvancedPackageQty: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-  },
-  PremiumPackageQty: {
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-  },
 });
+
+
 
 module.exports = User;
