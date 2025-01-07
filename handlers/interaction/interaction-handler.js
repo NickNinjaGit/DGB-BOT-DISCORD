@@ -53,6 +53,9 @@ async function handleInteraction(interaction) {
       case "b-card":
         await cardInteractions.BuyCard(interaction);
         break;
+      case "s-card":
+        await cardInteractions.SellCard(interaction);
+        break;
       case "b-pack":
         await cardInteractions.BuyPack(interaction);
         break;
@@ -61,8 +64,11 @@ async function handleInteraction(interaction) {
       case "f-card":
       await cardInteractions.findCard(interaction, activeInteractions);
         break;
-      case "fu-card":
-      await cardInteractions.findUserCard(interaction, activeInteractions);
+      case "my-cards":
+      await cardInteractions.myCards(interaction, activeInteractions);
+        break;
+      case 'collection':
+      await cardInteractions.Collection(interaction, activeInteractions);
         break;
       // admin relational commands
       case "add-cash":

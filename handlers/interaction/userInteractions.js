@@ -1,6 +1,7 @@
 // Controllers
 const EmbedController = require("../../controllers/EmbedController");
 const CardController = require("../../controllers/CardController");
+const PackageController = require("../../controllers/PackageController");
 const ButtonController = require("../../controllers/ButtonController");
 
 // Models
@@ -8,6 +9,7 @@ const User = require("../../models/User");
 // helpers
 const IsRegisteredUser = require("../../helpers/IsRegisteredUser");
 const checkActiveInteractions = require("../../helpers/checkActiveInteractions");
+const pagination = require("../../helpers/pagination");
 const wait = require("util").promisify(setTimeout);
 
 // gif exibition
@@ -225,9 +227,9 @@ async function Daily(interaction) {
 }
 
 async function Shop(interaction, activeInteractions) {
-  const userId = interaction.user.id;
+  const discordID = interaction.user.id;
   const currentInteractions = await checkActiveInteractions(
-    userId,
+    discordID,
     activeInteractions
   );
 
@@ -242,6 +244,7 @@ async function Shop(interaction, activeInteractions) {
   //get all cards from collection
 
   const cardList = await CardController.getAllCards();
+  const packageList = await PackageController.getAllPackages(discordID);
 
   // setting cards pagination to shop
   let pageId = 1;
@@ -249,19 +252,25 @@ async function Shop(interaction, activeInteractions) {
   const ItensPerPage = 3;
   const totalPages = Math.ceil(cardList.length / ItensPerPage);
 
-  let cardsPerPage = await CardController.getCardsPerPage(
+  let cardsPerPage = await pagination(
     pageId,
     ItensPerPage,
     cardList
   );
+  let packagePerPage = await pagination(
+    pageId,
+    ItensPerPage,
+    packageList
+  )
 
   // setting embed & buttons
   let shopEmbed = await EmbedController.ShowShop(
     cardsPerPage,
+    packagePerPage,
     pageId,
     totalPages
   );
-  const shopButtons = await ButtonController.ShopButtons();
+  const shopButtons = await ButtonController.NavButtons();
   await interaction.reply({
     embeds: [shopEmbed],
     ephemeral: true,
@@ -270,7 +279,7 @@ async function Shop(interaction, activeInteractions) {
 
   // setting collector
   const collector = interaction.channel.createMessageComponentCollector({
-    filter: (i) => i.user.id === userId,
+    filter: (i) => i.user.id === discordID,
     time: 24 * 60 * 60 * 1000, // 1 dia
   });
 
@@ -280,13 +289,20 @@ async function Shop(interaction, activeInteractions) {
     if (i.customId === "next") {
       pageId = pageId >= totalPages ? 1 : pageId + 1; // Volta para a primeira página se for a última
 
-      cardsPerPage = await CardController.getCardsPerPage(
+      cardsPerPage = await pagination(
         pageId,
         ItensPerPage,
         cardList
       );
+      packagePerPage = await pagination(
+        pageId,
+        ItensPerPage,
+        packageList
+      )
+      console.log(packagePerPage);
       shopEmbed = await EmbedController.ShowShop(
         cardsPerPage,
+        packagePerPage,
         pageId,
         totalPages
       );
@@ -299,13 +315,20 @@ async function Shop(interaction, activeInteractions) {
     // se o botao for previous, muda para a pagina anterior
     else if (i.customId === "previous") {
       pageId = pageId === 1 ? (pageId = totalPages) : (pageId = pageId - 1); // se a pagina for menor que 1, volta para a ultima
-      cardsPerPage = await CardController.getCardsPerPage(
+      cardsPerPage = await pagination(
         pageId,
         ItensPerPage,
         cardList
       );
+      packagePerPage = await pagination(
+        pageId,
+        ItensPerPage,
+        packageList
+      )
+      console.log(packagePerPage);
       shopEmbed = await EmbedController.ShowShop(
         cardsPerPage,
+        packagePerPage,
         pageId,
         totalPages
       );
@@ -316,7 +339,7 @@ async function Shop(interaction, activeInteractions) {
       });
     }
     if (i.customId === "quit") {
-      activeInteractions.delete(userId);
+      activeInteractions.delete(discordID);
       await i.update({
         content: "Saida realizada com sucesso.",
         embeds: [],

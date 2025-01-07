@@ -1,4 +1,5 @@
 const Package = require("../models/Package");
+const User = require("../models/User");
 const {Op} = require("sequelize");
 module.exports = class PackageController {
 
@@ -31,11 +32,16 @@ module.exports = class PackageController {
        
         return  {BasicPackQty, AdvancedPackQty, PremiumPackQty, onlyCommonQty, onlyRareQty, onlyEpicQty, onlyLegendaryQty, onlyMiticQty};
     }
-
+    static async getAllPackages(discordID)
+    {
+        const user = await User.findOne({where: {discordID}});
+        const packs = await Package.findAll({where: {userId: user.id}}); 
+        return packs;
+    }
     static async getPackageByName(name)
     {
-        const pack = Package.findOne({where: {name: {[Op.like]: `%${name}%`}}});
-        return pack;
+        const packageList = Package.findOne({where: {name: {[Op.like]: `%${name}%`}}});
+        return packageList;
     }
     static async BuyPackage(user, pack, quantity)
     {

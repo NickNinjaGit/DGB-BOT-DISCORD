@@ -1,20 +1,20 @@
 const {ButtonBuilder, ButtonStyle, ActionRowBuilder} = require('discord.js');
 
 module.exports = class ButtonController {
-    static async SkillDetails(skill1, skill2, command)
+    static async SkillDetails(skill1, skill2)
     {
         const skillRow = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId(command === 'f-card' ? 'skill1Details-f-card' : 'skill1Details-fu-card')
+                    .setCustomId('skill1Details-f-card')
                     .setLabel(`Detalhes de ${skill1}`)
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId(command === 'f-card' ? 'skill2Details-f-card' : 'skill2Details-fu-card')
+                    .setCustomId('skill2Details-f-card')
                     .setLabel(`Detalhes de ${skill2}`)
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId(command === 'f-card' ? 'quit-f-card' : 'quit-fu-card')
+                    .setCustomId('quit-f-card')
                     .setLabel(`Sair`)
                     .setStyle(ButtonStyle.Danger),
             )
@@ -22,11 +22,11 @@ module.exports = class ButtonController {
         const backRow = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId(command === 'f-card' ? 'back-f-card' : 'back-fu-card')
+                    .setCustomId('back-f-card')
                     .setLabel('Voltar')
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId(command === 'f-card' ? 'quit-f-card' : 'quit-fu-card')
+                    .setCustomId('quit-f-card')
                     .setLabel(`Sair`)
                     .setStyle(ButtonStyle.Danger),
             )
@@ -52,7 +52,7 @@ module.exports = class ButtonController {
         )
         return profileRow   
     }
-    static async ShopButtons()
+    static async NavButtons()
     {
         const shopRow = new ActionRowBuilder()
         .addComponents(

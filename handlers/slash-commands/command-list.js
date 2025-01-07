@@ -2,20 +2,22 @@ const {SlashCommandBuilder} = require('discord.js');
 module.exports = [
     /* Cards relational commands */
     // Open Package Command (Package Type, Package Quantity)
+    
+    
+    
     // Check User Card List
+    new SlashCommandBuilder()
+        .setName('my-cards')
+        .setDescription('Exibe os cards do seu inventário.'),
     // Check Collection Card List
-    // Find card on collection
+    new SlashCommandBuilder()
+        .setName('collection')
+        .setDescription('Exibe os cards da colecção.'),
+    // Find card
     new SlashCommandBuilder()
         .setName('f-card')
         .setDescription('Exibe os detalhes de um card da colecção.')
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para exibir os detalhes').setRequired(true)),
-    // Find card on user collection
-    new SlashCommandBuilder()
-        .setName('fu-card')
-        .setDescription('Exibe os detalhes de um card do seu inventário.')
-        .addStringOption(option => option.setName('card').setDescription('Selecione um card para exibir os detalhes').setRequired(true)),
-
-
     /* User relational commands */
     // Shop list Command
     new SlashCommandBuilder()
@@ -26,6 +28,12 @@ module.exports = [
         .setName('b-card')
         .setDescription('Compra um item da loja.')            
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para comprar').setRequired(true)),
+    // Sell Card Comman
+    new SlashCommandBuilder()
+        .setName('s-card')
+        .setDescription('Vende um card repetida do seu inventário.')
+        .addStringOption(option => option.setName('card').setDescription('Selecione um card para vender').setRequired(true))
+        .addIntegerOption(option => option.setName('quantity').setDescription('Selecione uma quantidade de cards para vender').setRequired(true)),
     // Buy Package Command
     new SlashCommandBuilder()
         .setName('b-pack')

@@ -86,25 +86,23 @@ module.exports = class EmbedController {
             
         return embed;
     }
-    static async ShowShop(cards, pageId, totalPages) {
+    static async ShowShop(cards, packages, pageId, totalPages) {
         const embed = new EmbedBuilder()
             .setAuthor({ name: "⠀⠀⠀⠀⠀⠀"})
-            .setTitle(`Loja ⚔️`)
+            .setColor('Gold')
+            .setTitle(`⠀🃏 Loja ⚔️`)
             .addFields(
                 { name: '⠀', value: `⠀`},
             )
             .addFields(
+                !packages.length ? { name: '•⠀📦⠀Parece que as opções de pacotes acabaram! Espere mais atualizações para ter acesso a novos tipos de pacotes!', value: `────୨ৎ────`} : 
                 { name: 'Pacotes', value: `────୨ৎ────`},
             )
             .addFields(
-                { name: '📦⠀Pacote Básico:⠀50⠀💸', value: `*Descrição: Esse pacote pode vir com 5 cartas de raridades baixas (Comum, Raro, Épico)*`},
-                { name: '────୨ৎ────', value: `⠀`},
-                { name: 'Pacote Avançado⠀150⠀💸', value: `*Descrição: O pacote avançado conta com 10 cartas excluindo apenas a raridade Mítica*`},
-                { name: '────୨ৎ────', value: `⠀`},
-                { name: 'Pacote Premium⠀300⠀💸', value: `*Descrição: O pacote premium conta com 20 cartas contendo todas as raridades*`},
-            )
-            .addFields(
-                { name: '⠀', value: `⠀`},
+                // função anonima pra imprimir os pacotes
+                packages.map(pack => {
+                    return { name: `📦⠀${pack.name}:⠀${pack.price}⠀💸`, value: `⠀`};
+                })
             )
             .addFields(
                 { name: '=====================================', value: `⠀`}
@@ -125,7 +123,7 @@ module.exports = class EmbedController {
     static async ShowCard(card) {
         const embed = new EmbedBuilder()
             .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
-            .setTitle(`⠀⠀⠀⠀⠀⠀⠀🃏⠀${card.name}⠀⚔️`)
+            .setTitle(`🃏⠀${card.name}⠀⚔️`)
             .setImage(card.image)
             .setColor(card.rarity.color)
             .addFields(
@@ -154,10 +152,35 @@ module.exports = class EmbedController {
     
         return embed;
     }
+    static async ShowUserCardList(cards, qty, pageId, totalPages) {
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
+            .setTitle(`⠀🃏⠀Cartas⠀⚔️`)
+            .setColor('Gold')
+            
+            .addFields(
+                { name: '⠀', value: `⠀` },
+                { name: 'Cartas', value: `────୨ৎ────` },
+            )
+            .setFooter({text: `Página ${pageId}/${totalPages}`});
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                const quantity = qty[i]; // Obter a quantidade correspondente para a carta
+                const rarity_info = await CardController.checkRarity(card.rarity);
+                const handleText = quantity > 1 ? 'Cópias' : 'Cópia'
+                embed.addFields(
+                    { name: `🃏⠀${card.name} - ${quantity} ${handleText}` , value: `⠀` },
+                    { name: `${rarity_info.name}⠀⠀⠀⠀⠀⠀⠀🌟**0**`, value: `${card.description}` },
+                    { name: '────────୨ৎ────────', value: `⠀` },
+                );
+            }        
+            return embed;
+    }
+    
     static async ShowUserCard(card, user, qty) {
         const embed = new EmbedBuilder()
             .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
-            .setTitle(`⠀⠀⠀⠀⠀⠀🃏⠀${card.name}⠀⚔️`)
+            .setTitle(`🃏⠀${card.name}⠀⚔️`)
             .setImage(card.image)
             .setColor(card.rarity.color)
             .addFields(

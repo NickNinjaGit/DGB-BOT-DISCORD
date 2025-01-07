@@ -104,7 +104,75 @@ async function loadCardCollection() {
         fireBlast.id, // SKILL1
         taunt.id // SKILL2
     )
-    return { fireDragon, luffy, zoro, nami, usopp, franky };
+    const Jinbei = await createCard(
+        "Jinbei", // Name
+        "Jinbei from One Piece", // Description
+        false, // Is Gif
+        "https://static.wikia.nocookie.net/onepiece/images/8/81/Jinbe_Anime_Infobox.png/revision/latest?cb=20240727174525&path-prefix=pt", // Image
+        "common", // Rarity
+        150, // Price
+        100, // SellValue
+        true, // Tradable
+        500, // HP
+        100, // MANA
+        50, // ATK
+        200, // DEF
+        30, // SPEED
+        fireBlast.id, // SKILL1
+        taunt.id // SKILL2
+    )
+    const Brook = await createCard(
+        "Brook", // Name
+        "Brook from One Piece", // Description
+        false, // Is Gif
+        "https://images.alphacoders.com/138/thumb-1920-1381546.png", // Image
+        "common", // Rarity
+        150, // Price
+        100, // SellValue
+        true, // Tradable
+        500, // HP
+        100, // MANA
+        50, // ATK
+        200, // DEF
+        30, // SPEED
+        fireBlast.id, // SKILL1
+        taunt.id // SKILL2
+    )
+    const NicoRobin = await createCard(
+        "Nico Robin", // Name
+        "Nico Robin from One Piece", // Description
+        false, // Is Gif
+        "https://i.pinimg.com/736x/a3/0a/68/a30a6876716a3b2fc8c242edaeb42be3.jpg", // Image 
+        "common", // Rarity
+        150, // Price
+        100, // SellValue
+        true, // Tradable
+        500, // HP
+        100, // MANA
+        50, // ATK
+        200, // DEF
+        30, // SPEED
+        fireBlast.id, // SKILL1
+        taunt.id // SKILL2
+    )
+    const Ace = await createCard(
+        "Ace", // Name
+        "Ace from One Piece", // Description
+        false, // Is Gif
+        "https://blog.explorersclub.com.br/wp-content/uploads/2024/05/Quem-e-Portgas-D-Ace-One-Piece-Blog-Banner.webp", // Image
+        "common", // Rarity
+        150, // Price
+        100, // SellValue
+        true, // Tradable
+        500, // HP
+        100, // MANA
+        50, // ATK
+        200, // DEF
+        30, // SPEED
+        fireBlast.id, // SKILL1
+        taunt.id // SKILL2
+    )
+    return { fireDragon, luffy, zoro, nami, usopp, franky, Jinbei, Brook, NicoRobin, Ace };
 }
 
 module.exports = loadCardCollection;
