@@ -46,6 +46,25 @@ module.exports = class CardController {
         return processedCards;
     }
 
+    static async getUserCards(user) {
+        const userCards = await UserCards.findAll({where: {userId: user.id}});
+
+        // get complete info
+        const cardList = await Promise.all(
+            userCards.map(async (cardInstance) => {
+                const card = await Card.findOne({where: {id: cardInstance.cardId}});
+                const rarity_info = await CardController.checkRarity(card.rarity);
+                let i = 0;
+                return {
+                    ...userCards[i++].dataValues,
+                    ...card.dataValues, // Inclui os campos do card no objeto
+                    rarity: rarity_info,
+                };
+            })
+        )
+        return cardList;
+
+    }
     static async getCardCollection(userId)
     {
         const user = await User.findOne({where: {discordID: userId}});
@@ -85,8 +104,9 @@ module.exports = class CardController {
     static async AddCard(discordID, cardName)
     {
         const user = await User.findOne({where: {discordID}});
-        const card = await Card.findOne({where: {name: cardName}});
+        const card = await Card.findOne({where: {name: {[Op.like]: `%${cardName}%`}}});
         const hasCard = await UserCards.findOne({where: {userId: user.id, cardId: card.id}});
+   
         if(hasCard)
         {
             hasCard.quantity += 1;
@@ -98,7 +118,7 @@ module.exports = class CardController {
             cardId: card.id,
             quantity: 1,
             starPoints: 0,
-            currentIMG: card.IMG,
+            currentIMG: card.image,
             currentHP: card.HP,
             currentMANA: card.MANA,
             currentATK: card.ATK,
