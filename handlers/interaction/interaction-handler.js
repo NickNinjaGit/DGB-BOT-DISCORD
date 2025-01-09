@@ -61,9 +61,8 @@ async function handleInteraction(interaction) {
       case "f-card":
       await cardInteractions.findCard(interaction, activeInteractions);
         break;
-      case "fu-card":
-      await cardInteractions.findUserCard(interaction, activeInteractions);
-        break;
+      case "my-cards":
+        await cardInteractions.myCards(interaction, activeInteractions);
       // admin relational commands
       case "add-cash":
       await adminInteractions.addCash(interaction);

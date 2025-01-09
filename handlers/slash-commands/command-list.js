@@ -3,18 +3,15 @@ module.exports = [
     /* Cards relational commands */
     // Open Package Command (Package Type, Package Quantity)
     // Check User Card List
+    new SlashCommandBuilder()
+        .setName("my-cards")
+        .setDescription("Exibe uma lista com todas as cartas do jogador"),
     // Check Collection Card List
     // Find card on collection
     new SlashCommandBuilder()
         .setName('f-card')
         .setDescription('Exibe os detalhes de um card da colecção.')
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para exibir os detalhes').setRequired(true)),
-    // Find card on user collection
-    new SlashCommandBuilder()
-        .setName('fu-card')
-        .setDescription('Exibe os detalhes de um card do seu inventário.')
-        .addStringOption(option => option.setName('card').setDescription('Selecione um card para exibir os detalhes').setRequired(true)),
-
 
     /* User relational commands */
     // Shop list Command

@@ -67,11 +67,6 @@ module.exports = class CardController {
         
     }
     
-    static async getCardsPerPage(pageId, ItensPerPage, cards) {
-        const startIndex = (pageId - 1) * ItensPerPage;
-        const endIndex = startIndex + ItensPerPage;
-        return cards.slice(startIndex, endIndex); // Retorna um array de itens
-    }
     static async checkRarity(rarity)
     {
         const COMMON = "common";
@@ -102,6 +97,8 @@ module.exports = class CardController {
             userId: user.id,
             cardId: card.id,
             quantity: 1,
+            starPoints: 0,
+            currentIMG: card.IMG,
             currentHP: card.HP,
             currentMANA: card.MANA,
             currentATK: card.ATK,

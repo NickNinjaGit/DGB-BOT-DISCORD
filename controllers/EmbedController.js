@@ -86,10 +86,10 @@ module.exports = class EmbedController {
             
         return embed;
     }
-    static async ShowShop(cards, pageId, totalPages) {
+    static async ShowShop(cards, packages, pageId, totalPages) {
         const embed = new EmbedBuilder()
             .setAuthor({ name: "⠀⠀⠀⠀⠀⠀"})
-            .setTitle(`Loja ⚔️`)
+            .setTitle(`⠀⠀⠀⠀⠀⠀⠀⠀⠀🃏Loja ⚔️`)
             .addFields(
                 { name: '⠀', value: `⠀`},
             )
@@ -97,14 +97,11 @@ module.exports = class EmbedController {
                 { name: 'Pacotes', value: `────୨ৎ────`},
             )
             .addFields(
-                { name: '📦⠀Pacote Básico:⠀50⠀💸', value: `*Descrição: Esse pacote pode vir com 5 cartas de raridades baixas (Comum, Raro, Épico)*`},
-                { name: '────୨ৎ────', value: `⠀`},
-                { name: 'Pacote Avançado⠀150⠀💸', value: `*Descrição: O pacote avançado conta com 10 cartas excluindo apenas a raridade Mítica*`},
-                { name: '────୨ৎ────', value: `⠀`},
-                { name: 'Pacote Premium⠀300⠀💸', value: `*Descrição: O pacote premium conta com 20 cartas contendo todas as raridades*`},
-            )
-            .addFields(
-                { name: '⠀', value: `⠀`},
+                // iterate over the packages array and add each package to the embed
+                ...packages.map((pack) => ({
+                    name: `${pack.name}: ${pack.price}⠀💸`,
+                    value: `────୨ৎ────`,
+                })),
             )
             .addFields(
                 { name: '=====================================', value: `⠀`}
