@@ -1,5 +1,4 @@
 const EmbedController = require("./EmbedController");
-const wait = require("util").promisify(setTimeout);
 
 // helper
 const Pagination = require("../helpers/pagination");

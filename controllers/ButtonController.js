@@ -54,7 +54,7 @@ module.exports = class ButtonController {
     }
     static async NavButtons()
     {
-        const shopRow = new ActionRowBuilder()
+        const navRow = new ActionRowBuilder()
         .addComponents(
             new ButtonBuilder()
                 .setCustomId('previous')
@@ -69,6 +69,6 @@ module.exports = class ButtonController {
                 .setLabel(`Sair`)
                 .setStyle(ButtonStyle.Danger),
         )
-        return shopRow
+        return navRow
     }
 }
