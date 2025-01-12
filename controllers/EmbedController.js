@@ -172,6 +172,38 @@ module.exports = class EmbedController {
         return embed
     }
 
+    static async ShowCollection(card, pageId, totalPages) {
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
+            .setTitle(`🃏⠀${card.name}⠀⚔️`)
+            .setImage(card.image)
+            .setColor(card.rarity.color)
+            .addFields(
+                { name: `Raridade: ${card.rarity.name}`, value: `⠀`},
+            )
+            .addFields(
+                {name: 'Descrição', value: `*${card.description}*`}
+            )      
+            .addFields(
+                { name: 'Preço', value: `**${card.price}**⠀💵`, inline: true },
+                { name: 'Valor de Venda', value: `**${card.sellValue}**⠀💰`, inline: true },
+                { name: '⠀⠀', value: `-----------------------------` }
+            )
+
+            
+            .addFields(
+                { name: `${card.HP}⠀❤️`, value: `⠀`, inline: true },
+                { name: `${card.MANA}⠀🌀`, value: `⠀`, inline: true },
+            )
+            
+            .addFields(
+                { name: `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀${card.skill1.name}`, value: `**${card.ATK}**⠀🗡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${card.skill1?.cost || 0}**⠀💠`, },
+                { name: `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀${card.skill2.name}:`, value: `**${card.DEF}**⠀🛡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${card.skill2?.cost || 0}**⠀💠`, },
+                { name: `⠀`, value: `**${card.SPEED}**⠀💨`}
+            )
+            .setFooter({text: `Pagina ${pageId}/${totalPages}`});
+        return embed;
+    }
     static async ShowSkill(skill) {
         const skillType = checkSkillType(skill.SkillType, skill.SkillValue, skill.StatusChangeType, skill.SkillMultiplier);
         const embed = new EmbedBuilder()

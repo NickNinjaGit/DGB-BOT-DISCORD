@@ -116,11 +116,24 @@ async function Collection(interaction, activeInteractions) {
   // get all cards from collection
   const cards = await CardController.getAllCards();
 
-  // setting up 1 only
-  let pageId = 1;
-  const ItensPerPage = 1;
-  const totalPages = Math.ceil(cards.length / ItensPerPage);
-  
+  let currentCardIndex = 0;
+  const currentCard = cards[currentCardIndex];
+
+  const totalPages = cards.length;
+
+  // show collection
+  const collectionEmbed = await EmbedController.ShowCollection(currentCard, currentCard.id, totalPages);
+  const navButtons = await ButtonController.NavButtons();
+
+  activeInteractions.add(discordID);
+
+  await interaction.reply({
+    embeds: [collectionEmbed],
+    components: [navButtons],
+    fetchReply: true
+  })
+
+  CollectorController.CollectionController(interaction, discordID, currentCardIndex, navButtons, activeInteractions)
 }
 async function BuyCard(interaction) {
   const userId = interaction.user.id;

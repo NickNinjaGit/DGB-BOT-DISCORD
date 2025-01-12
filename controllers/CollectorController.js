@@ -1,4 +1,5 @@
 const EmbedController = require("./EmbedController");
+const CardController = require("./CardController");
 
 // helper
 const Pagination = require("../helpers/pagination");
@@ -65,14 +66,21 @@ module.exports = class CollectorController {
       time: 600000, // 10 minuto
     });
     let cardsPerPage = await Pagination(pageId, 3, cardList);
-    let userCardsEmbed = await EmbedController.ShowUserCards(cardsPerPage, pageId, totalPages);
+    let userCardsEmbed = await EmbedController.ShowUserCards(
+      cardsPerPage,
+      pageId,
+      totalPages
+    );
 
     collector.on("collect", async (i) => {
-      if (i.customId === "next")
-      {
+      if (i.customId === "next") {
         pageId = pageId >= totalPages ? 1 : pageId + 1; // Volta para a primeira página se for a último
         cardsPerPage = await Pagination(pageId, 3, cardList);
-        userCardsEmbed = await EmbedController.ShowUserCards(cardsPerPage, pageId, totalPages);
+        userCardsEmbed = await EmbedController.ShowUserCards(
+          cardsPerPage,
+          pageId,
+          totalPages
+        );
         await i.update({
           embeds: [userCardsEmbed],
           components: [navButtons],
@@ -81,7 +89,11 @@ module.exports = class CollectorController {
       } else if (i.customId === "previous") {
         pageId = pageId <= 1 ? totalPages : pageId - 1;
         cardsPerPage = await Pagination(pageId, 3, cardList);
-        userCardsEmbed = await EmbedController.ShowUserCards(cardsPerPage, pageId, totalPages);
+        userCardsEmbed = await EmbedController.ShowUserCards(
+          cardsPerPage,
+          pageId,
+          totalPages
+        );
         await i.update({
           embeds: [userCardsEmbed],
           components: [navButtons],
@@ -100,6 +112,70 @@ module.exports = class CollectorController {
     });
     // Configurar o coletor para ouvir interações nos botões
   }
+  static async CollectionController(
+    interaction,
+    discordID,
+    currentCardIndex,
+    navButtons,
+    activeInteractions
+  ) {
+    const collector = interaction.channel.createMessageComponentCollector({
+      filter: (i) => i.user.id === discordID,
+      time: 600000, // 10 minutos
+    });
+  
+    const cards = await CardController.getAllCards();
+  
+    collector.on("collect", async (i) => {
+      if (i.customId === "next") {
+        // Atualiza o índice, garantindo que ele não ultrapasse os limites
+        currentCardIndex = (currentCardIndex + 1) % cards.length;
+  
+        const currentCard = cards[currentCardIndex];
+        const CollectionEmbed = await EmbedController.ShowCollection(
+          currentCard,
+          currentCardIndex + 1, // Índice atual +1 para exibir como posição
+          cards.length
+        );
+  
+        await i.update({
+          embeds: [CollectionEmbed],
+          components: [navButtons],
+          fetchReply: true,
+        });
+      }
+  
+      if (i.customId === "previous") {
+        // Atualiza o índice, garantindo que ele não fique negativo
+        currentCardIndex = (currentCardIndex - 1 + cards.length) % cards.length;
+  
+        const currentCard = cards[currentCardIndex];
+        const CollectionEmbed = await EmbedController.ShowCollection(
+          currentCard,
+          currentCardIndex + 1, // Índice atual +1 para exibir como posição
+          cards.length
+        );
+  
+        await i.update({
+          embeds: [CollectionEmbed],
+          components: [navButtons],
+          fetchReply: true,
+        });
+      }
+  
+      if (i.customId === "quit") {
+        activeInteractions.delete(discordID);
+        collector.stop();
+        await i.update({
+          content: "Interação finalizada.",
+          components: [],
+          fetchReply: true,
+        });
+        await i.deleteReply();
+      }
+    });
+  }
+  
   static async ProfileCollector(
     interaction,
     discordID,
