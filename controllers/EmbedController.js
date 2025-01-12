@@ -89,8 +89,7 @@ module.exports = class EmbedController {
     static async ShowShop(cards, packages, pageId, totalPages) {
         const embed = new EmbedBuilder()
             .setAuthor({ name: "⠀⠀⠀⠀⠀⠀"})
-            .setColor('Gold')
-            .setTitle(`⠀🃏 Loja ⚔️`)
+            .setTitle(`⠀⠀⠀⠀⠀⠀⠀⠀⠀🃏Loja ⚔️`)
             .addFields(
                 { name: '⠀', value: `⠀`},
             )
@@ -99,10 +98,11 @@ module.exports = class EmbedController {
                 { name: 'Pacotes', value: `────୨ৎ────`},
             )
             .addFields(
-                // função anonima pra imprimir os pacotes
-                packages.map(pack => {
-                    return { name: `📦⠀${pack.name}:⠀${pack.price}⠀💸`, value: `⠀`};
-                })
+                // iterate over the packages array and add each package to the embed
+                ...packages.map((pack) => ({
+                    name: `${pack.name}: ${pack.price}⠀💸`,
+                    value: `────୨ৎ────`,
+                })),
             )
             .addFields(
                 { name: '=====================================', value: `⠀`}
@@ -127,7 +127,7 @@ module.exports = class EmbedController {
             .setImage(card.image)
             .setColor(card.rarity.color)
             .addFields(
-                { name: `⠀⠀⠀⠀⠀⠀⠀⠀ Raridade: ${card.rarity.name}`, value: `⠀`},
+                { name: `Raridade: ${card.rarity.name}`, value: `⠀`},
             )
             .addFields(
                 {name: 'Descrição', value: `*${card.description}*`}
@@ -152,73 +152,31 @@ module.exports = class EmbedController {
     
         return embed;
     }
-    static async ShowUserCardList(cards, qty, pageId, totalPages) {
+    static async ShowUserCards(cardList, pageId, totalPages) {
         const embed = new EmbedBuilder()
             .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
-            .setTitle(`⠀🃏⠀Cartas⠀⚔️`)
-            .setColor('Gold')
-            
+            .setTitle(`🃏 Inventário de Cartas ⚔️`)
             .addFields(
-                { name: '⠀', value: `⠀` },
-                { name: 'Cartas', value: `────୨ৎ────` },
-            )
-            .setFooter({text: `Página ${pageId}/${totalPages}`});
-            for (let i = 0; i < cards.length; i++) {
-                const card = cards[i];
-                const quantity = qty[i]; // Obter a quantidade correspondente para a carta
-                const rarity_info = await CardController.checkRarity(card.rarity);
-                const handleText = quantity > 1 ? 'Cópias' : 'Cópia'
-                embed.addFields(
-                    { name: `🃏⠀${card.name} - ${quantity} ${handleText}` , value: `⠀` },
-                    { name: `${rarity_info.name}⠀⠀⠀⠀⠀⠀⠀🌟**0**`, value: `${card.description}` },
-                    { name: '────────୨ৎ────────', value: `⠀` },
-                );
-            }        
-            return embed;
-    }
-    
-    static async ShowUserCard(card, user, qty) {
-        const embed = new EmbedBuilder()
-            .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
-            .setTitle(`🃏⠀${card.name}⠀⚔️`)
-            .setImage(card.image)
-            .setColor(card.rarity.color)
-            .addFields(
-                { name: `⠀⠀⠀⠀⠀⠀**${qty}**⠀♦️⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀**0**⠀🌟`, value: `⠀`},
+                { name: '⠀', value: `⠀`},
             )
             .addFields(
-                { name: `⠀⠀⠀⠀⠀⠀⠀⠀ Raridade: ${card.rarity.name}`, value: `⠀`},
+                { name: 'Cartas', value: `────୨ৎ────`},
             )
-            .addFields(
-                {name: 'Descrição', value: `*${card.description}*`}
-            )      
-            .addFields(
-                { name: 'Preço', value: `**${card.price}**⠀💵`, inline: true },
-                { name: 'Valor de Venda', value: `**${card.sellValue}**⠀💰`, inline: true },
-                { name: '⠀⠀', value: `-----------------------------` }
+            .setFooter({text: `Pagina ${pageId}/${totalPages}`});
+        cardList.forEach(card => {
+            embed.addFields(
+                { name: `${card.name} ⠀${card.quantity}⠀♦️ ${card.starPoints} 🌟`, value: `${card.description}`},
+                {name: '⠀', value: `-----------------------------`},
             )
-
-            
-            .addFields(
-                { name: `${card.HP}⠀❤️`, value: `⠀`, inline: true },
-                { name: `${card.MANA}⠀🌀`, value: `⠀`, inline: true },
-            )
-            
-            .addFields(
-                { name: `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀${card.skill1.name}`, value: `**${card.ATK}**⠀🗡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${card.skill1?.cost || 0}**⠀💠`, },
-                { name: `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀${card.skill2.name}:`, value: `**${card.DEF}**⠀🛡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${card.skill2?.cost || 0}**⠀💠`, },
-                { name: `⠀`, value: `**${card.SPEED}**⠀💨`}
-            )
-        .setFooter({text: "Pertencente ao jogador: " + user.name});
-    
-        return embed;
+        })
+        return embed
     }
 
     static async ShowSkill(skill) {
         const skillType = checkSkillType(skill.SkillType, skill.SkillValue, skill.StatusChangeType, skill.SkillMultiplier);
         const embed = new EmbedBuilder()
             .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
-            .setTitle(`⠀⠀⠀⠀⠀⠀⠀⠀🌀⠀${skill.name}⠀🌀`)
+            .setTitle(`🌀⠀${skill.name}⠀🌀`)
             .setImage(skill.image)
             .setDescription(`**Descrição:** *${skill.description}*`)
             .setColor('Gold')

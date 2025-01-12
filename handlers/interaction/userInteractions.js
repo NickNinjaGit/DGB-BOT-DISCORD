@@ -1,15 +1,18 @@
 // Controllers
 const EmbedController = require("../../controllers/EmbedController");
+const CollectorController = require("../../controllers/CollectorController");
 const CardController = require("../../controllers/CardController");
 const PackageController = require("../../controllers/PackageController");
 const ButtonController = require("../../controllers/ButtonController");
+const PackageController = require("../../controllers/PackageController");
 
 // Models
 const User = require("../../models/User");
 // helpers
 const IsRegisteredUser = require("../../helpers/IsRegisteredUser");
 const checkActiveInteractions = require("../../helpers/checkActiveInteractions");
-const pagination = require("../../helpers/pagination");
+const checkCooldownTimer = require("../../helpers/checkCooldownTimer");
+const Pagination = require("../../helpers/pagination");
 const wait = require("util").promisify(setTimeout);
 
 // gif exibition
@@ -17,65 +20,31 @@ const path = require("path");
 img_folder = path.resolve(__dirname, "../../images/");
 const { AttachmentBuilder } = require("discord.js");
 
+
 /* User Relational interactions */
 async function myProfile(interaction, activeInteractions) {
-  const userId = interaction.user.id;
+  const discordID = interaction.user.id;
   const userImage = interaction.user.displayAvatarURL();
 
-  const currentInteractions = await checkActiveInteractions(
-    userId,
-    activeInteractions
-  );
+  const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
 
-  if (currentInteractions) {
-    const msg = await interaction.channel.send(
-      "Você possui uma interação ativa! Por favor, aguarde ou finalize a interação antes de executar o comando."
-    );
-    await wait(3000); // Aguarda 3 segundos
-    msg.delete(); // Deleta a mensagem
+  if (isActiveInteractions === true)
+  {
     return;
   }
 
-  
   const myProfileEmbed = await EmbedController.ShowUserProfile(
-    userId,
+    discordID,
     userImage
   );
   const profileButtons = await ButtonController.ProfileButtons();
-  await interaction.reply({ embeds: [myProfileEmbed], components: [profileButtons], fetchReply: true,  });
-
-  const collector = interaction.channel.createMessageComponentCollector({
-    filter: (i) => i.user.id === userId,
-    time: 600000, // 10 minuto
+  await interaction.reply({
+    embeds: [myProfileEmbed],
+    components: [profileButtons],
+    fetchReply: true,
   });
 
-  // Configurar o coletor para ouvir interações nos botões
-  collector.on("collect", async (i) => {
-    const ShowPackageInfo = await EmbedController.ShowPackageInfo(userId);
-    if (i.customId === "pack-info") {
-      await i.update({
-        embeds: [ShowPackageInfo],
-        components: [profileButtons],
-        fetchReply: true,
-      });
-    } else if (i.customId === "user-info") {
-      await i.update({
-        embeds: [myProfileEmbed],
-        components: [profileButtons],
-        fetchReply: true,
-      });
-    } else if (i.customId === "quit") {
-      activeInteractions.delete(userId);
-      collector.stop();
-      await i.update({
-        content: "Interação finalizada.",
-        components: [],
-        fetchReply: true,
-      });
-      
-      await i.deleteReply();
-    }
-  });
+  CollectorController.ProfileCollector(interaction, discordID, myProfileEmbed, profileButtons, activeInteractions);
 }
 
 async function friendProfile(interaction) {
@@ -123,39 +92,30 @@ async function friendProfile(interaction) {
 
 const Work_cooldown = new Map(); // Mapa para rastrear os cooldowns de trabalhos
 async function Work(interaction) {
-  const userId = interaction.user.id;
+  const discordID = interaction.user.id;
   const work_gif = new AttachmentBuilder(`${img_folder}/work.gif`); // Certifique-se de que o caminho está correto
   const minMoney = 10;
   const maxMoney = 100;
   const cooldownTime = 3 * 60 * 60 * 1000; // 3 horas em milissegundos
 
   // Verifica se o usuário está em cooldown
-  if (Work_cooldown.has(userId)) {
-    const remainingTime = Work_cooldown.get(userId) - Date.now();
-    if (remainingTime > 0) {
-      const hours = Math.floor(remainingTime / 1000 / 3600);
-      const minutes = Math.floor(remainingTime / 1000 / 60);
-      const seconds = Math.floor((remainingTime / 1000) % 60);
-      interaction.reply({
-        content: `Você já trabalhou! Volte em **${hours} horas, ${minutes} minutos e ${seconds} segundos.**`,
-      });
-      await wait(3000);
-      interaction.deleteReply();
-      return;
-    }
+  const isInCooldown = await checkCooldownTimer(discordID, interaction, Work_cooldown);
+
+  if (isInCooldown)
+  {
+    return;
   }
-
+  // Calcula a quantidade de dinheiro ganho
   const moneyQty = Math.random() * (maxMoney - minMoney) + minMoney;
+  // Define o cooldown mapeando o usuário com o tempo de cooldown
+  Work_cooldown.set(discordID, Date.now() + cooldownTime);
 
-  // Atualiza os dados do usuário no banco
-  const user = await User.findOne({ where: { discordID: userId } });
+  // Aumenta o dinheiro do usuário
+  const user = await User.findOne({ where: { discordID } });
   user.wallet += moneyQty;
   await user.save();
 
-  // Define o cooldown
-  Work_cooldown.set(userId, Date.now() + cooldownTime);
-
-  // Responde ao comando
+  // Responde o usuário com o dinheiro ganho.
   await interaction.reply({
     content: `Você ganhou ${moneyQty.toFixed(
       0
@@ -167,45 +127,42 @@ async function Work(interaction) {
   interaction.deleteReply();
 
   // Envia DM ao usuário após o cooldown
-  setTimeout(() => {
-    interaction.user.send({
-      content: `Você já pode trabalhar de novo, vagabundo!`,
-    });
-    Work_cooldown.delete(userId); // Remove o usuário do cooldown após 3 horas
-  }, cooldownTime);
+  await wait(cooldownTime);
+  interaction.user.send({
+    content: `Agora é hora de trabalhar, ${interaction.user.username}!`,
+  });
+  Work_cooldown.delete(discordID);
 }
 
 const Daily_cooldown = new Map(); // Mapa para rastrear os cooldowns de dinheiro diario
 async function Daily(interaction) {
-  const userId = interaction.user.id;
+  const discordID = interaction.user.id;
   const daily_gif = new AttachmentBuilder(`${img_folder}/daily.gif`); // Certifique-se de que o caminho está correto
   minMoney = 50;
   maxMoney = 250;
-  const moneyQty = Math.random() * (maxMoney - minMoney) + minMoney;
   const cooldownTime = 24 * 60 * 60 * 1000; // 24 horas em milissegundos
 
+  // Calcula a quantidade de dinheiro ganho
+  const moneyQty = Math.random() * (maxMoney - minMoney) + minMoney;
+
   // Verifica se o usuário está em cooldown
-  if (Daily_cooldown.has(userId)) {
-    const remainingTime = Daily_cooldown.get(userId) - Date.now();
-    if (remainingTime > 0) {
-      const hours = Math.floor(remainingTime / 1000 / 3600);
-      const minutes = Math.floor(remainingTime / 1000 / 60);
-      const seconds = Math.floor((remainingTime / 1000) % 60);
-      interaction.reply({
-        content: `Você já coletou seu Daily! Volte em **${hours} horas, ${minutes} minutos e ${seconds} segundos.**`,
-      });
-      await wait(3000);
-      interaction.deleteReply();
-      return;
-    }
+  const isInCooldown = await checkCooldownTimer(
+    discordID,
+    interaction,
+    Daily_cooldown
+  );
+
+  if (isInCooldown) {
+    return;
   }
+
   // Atualiza os dados do usuário no banco
-  const user = await User.findOne({ where: { discordID: userId } });
+  const user = await User.findOne({ where: { discordID } });
   user.wallet += moneyQty;
   await user.save();
 
   // Define o cooldown
-  Daily_cooldown.set(userId, Date.now() + cooldownTime);
+  Daily_cooldown.set(discordID, Date.now() + cooldownTime);
 
   // Responde ao comando
   await interaction.reply({
@@ -218,55 +175,52 @@ async function Daily(interaction) {
   interaction.deleteReply();
 
   // Envia DM ao usuário após o cooldown
-  setTimeout(() => {
-    interaction.user.send({
-      content: `Você já pode resgatar seu daily novamente!`,
-    });
-    Daily_cooldown.delete(userId); // Remove o usuário do cooldown após 3 horas
-  }, cooldownTime);
+  await wait(cooldownTime);
+  interaction.user.send({
+    content: `Você já pode resgatar seu daily novamente!`,
+  });
+  Daily_cooldown.delete(discordID); // Remove o usuário do cooldown após 3 horas
 }
 
 async function Shop(interaction, activeInteractions) {
   const discordID = interaction.user.id;
-  const currentInteractions = await checkActiveInteractions(
-    discordID,
-    activeInteractions
-  );
+  const user = await User.findOne({ where: { discordID } });
 
-  if (currentInteractions) {
-    const msg = await interaction.channel.send(
-      "Você possui uma interação ativa! Por favor, aguarde ou finalize a interação antes de executar o comando."
-    );
-    await wait(3000); // Aguarda 3 segundos
-    msg.delete(); // Deleta a mensagem
+  const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
+
+  if (isActiveInteractions === true)
+  {
     return;
   }
-  //get all cards from collection
 
+  //get all cards from collection
   const cardList = await CardController.getAllCards();
-  const packageList = await PackageController.getAllPackages(discordID);
+  const packageList = await PackageController.getAllPackages(user);
 
   // setting cards pagination to shop
   let pageId = 1;
 
   const ItensPerPage = 3;
+
+  // Faz um calculo de total de páginas considerando as páginas quebradiças
   const totalPages = Math.ceil(cardList.length / ItensPerPage);
 
-  let cardsPerPage = await pagination(
+  let cardsPerPage = await Pagination(
     pageId,
     ItensPerPage,
     cardList
   );
-  let packagePerPage = await pagination(
+
+  let packagesPerPage = await Pagination(
     pageId,
     ItensPerPage,
     packageList
-  )
+  );
 
   // setting embed & buttons
   let shopEmbed = await EmbedController.ShowShop(
     cardsPerPage,
-    packagePerPage,
+    packagesPerPage,
     pageId,
     totalPages
   );
@@ -277,79 +231,20 @@ async function Shop(interaction, activeInteractions) {
     components: [shopButtons],
   });
 
-  // setting collector
-  const collector = interaction.channel.createMessageComponentCollector({
-    filter: (i) => i.user.id === discordID,
-    time: 24 * 60 * 60 * 1000, // 1 dia
-  });
-
-  // handling buttons
-  collector.on("collect", async (i) => {
-    // se o botao for next, muda para a proxima pagina
-    if (i.customId === "next") {
-      pageId = pageId >= totalPages ? 1 : pageId + 1; // Volta para a primeira página se for a última
-
-      cardsPerPage = await pagination(
-        pageId,
-        ItensPerPage,
-        cardList
-      );
-      packagePerPage = await pagination(
-        pageId,
-        ItensPerPage,
-        packageList
-      )
-      console.log(packagePerPage);
-      shopEmbed = await EmbedController.ShowShop(
-        cardsPerPage,
-        packagePerPage,
-        pageId,
-        totalPages
-      );
-      await i.update({
-        embeds: [shopEmbed],
-        ephemeral: true,
-        components: [shopButtons],
-      });
-    }
-    // se o botao for previous, muda para a pagina anterior
-    else if (i.customId === "previous") {
-      pageId = pageId === 1 ? (pageId = totalPages) : (pageId = pageId - 1); // se a pagina for menor que 1, volta para a ultima
-      cardsPerPage = await pagination(
-        pageId,
-        ItensPerPage,
-        cardList
-      );
-      packagePerPage = await pagination(
-        pageId,
-        ItensPerPage,
-        packageList
-      )
-      console.log(packagePerPage);
-      shopEmbed = await EmbedController.ShowShop(
-        cardsPerPage,
-        packagePerPage,
-        pageId,
-        totalPages
-      );
-      await i.update({
-        embeds: [shopEmbed],
-        ephemeral: true,
-        components: [shopButtons],
-      });
-    }
-    if (i.customId === "quit") {
-      activeInteractions.delete(discordID);
-      await i.update({
-        content: "Saida realizada com sucesso.",
-        embeds: [],
-        components: [],
-        ephemeral: true,
-      });
-      collector.stop();
-      await i.deleteReply();
-    }
-  });
+  CollectorController.ShopCollector(
+    interaction,
+    discordID,
+    shopEmbed,
+    shopButtons,
+    cardList,
+    packageList,
+    pageId,
+    totalPages,
+    ItensPerPage,
+    cardsPerPage,
+    packagesPerPage,
+    activeInteractions
+  );
 }
 
 module.exports = { myProfile, friendProfile, Work, Daily, Shop };

@@ -24,6 +24,14 @@ const UserCards = db.define("usercards", {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    starPoints: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
+    currentIMG: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     currentHP: {
         type: DataTypes.INTEGER,
         allowNull: false,

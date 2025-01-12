@@ -3,13 +3,10 @@ const EmbedController = require("../../controllers/EmbedController");
 const CardController = require("../../controllers/CardController");
 const ButtonController = require("../../controllers/ButtonController");
 const PackageController = require("../../controllers/PackageController");
+const CollectorController = require("../../controllers/CollectorController");
 
 // Models
 const User = require("../../models/User");
-const UserCards = require("../../models/UserCards");
-const Card = require("../../models/Card");
-// handlers
-const handleSkillInteraction = require("../skills/handleSkillInteraction");
 
 // validators
 const checkActiveInteractions = require("../validations/checkActiveInteractions");
@@ -17,34 +14,38 @@ const cardExist = require("../validations/cardExist");
 const userHasCards = require("../validations/userHasCards");
 // helpers
 const wait = require("node:timers/promises").setTimeout;
-const pagination = require("../../helpers/pagination");
+const checkActiveInteractions = require("../../helpers/checkActiveInteractions");
+const Pagination = require("../../helpers/pagination");
 
-// gif exibition
-const path = require("path");
-img_folder = path.resolve(__dirname, "../../images/");
-const { AttachmentBuilder } = require("discord.js");
 
 /* Card Relational interactions */
 async function findCard(interaction, activeInteractions) {
-  const userId = interaction.user.id;
+  const discordID = interaction.user.id;
 
-  // Verificar se já existe uma interação ativa para este usuário
-  await checkActiveInteractions(userId, activeInteractions);
+  const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
 
-  // Marcar a interação como ativa
-  activeInteractions.add(userId);
+  if (isActiveInteractions === true)
+  {
+    return;
+  }
 
-  // Obter o nome da carta
+  // Lógica principal do comando
   const cardName = interaction.options.getString("card");
   const card = await CardController.getCardByName(cardName);
 
-  // Verificar se a carta foi encontrada
-  await cardExist(card, activeInteractions, interaction, userId);
+  if (!card) {
+    await interaction.reply({
+      content: "Card não encontrado!",
+    });
+    await wait(1000);
+    await interaction.deleteReply();
+    return;
+  }
 
   const cardEmbed = await EmbedController.ShowCard(card);
   const skillDetails = await ButtonController.SkillDetails(
     card.skill1.name,
-    card.skill2.name
+    card.skill2.name,
   );
 
   await interaction.reply({
@@ -53,197 +54,71 @@ async function findCard(interaction, activeInteractions) {
     fetchReply: true,
   });
 
-  handleSkillInteraction(
-    interaction,
-    userId,
-    card,
-    cardEmbed,
-    skillDetails,
-    activeInteractions
-  );
+  CollectorController.CardCollector(interaction, discordID, card, cardEmbed, skillDetails, activeInteractions);
+
+
 }
 
-async function myCards(interaction, activeInteractions) {
+async function MyCards(interaction, activeInteractions) {
   const discordID = interaction.user.id;
+  const user = await User.findOne({ where: { discordID } });
 
-  // Verificar se já existe uma interação ativa para este usuário
-  await checkActiveInteractions(discordID, activeInteractions);
+  const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
 
-  // Marcar a interação como ativa
-  activeInteractions.add(discordID);
+  if(isActiveInteractions === true)
+  {
+    return;
+  }
+  // get all user cards
+  const userCards = await CardController.getUserCards(user);
 
-  const user = await User.findOne({ where: { discordID: discordID } });
-
-  // Query Cards to get all card info
-  const cardList = await Card.findAll({
-    include: {
-      model: User,
-      where: { id: user.id },
-      through: { attributes: [] }, // Remove os atributos extras da tabela de junção
-    },
-  });
-  // filter only cards that user has
-  const userCards = await UserCards.findAll({ where: { userId: user.id } });
-  let cardsqty = userCards.map((card) => card.quantity);
-
-  // Check if user has cards
-  userHasCards(userCards, interaction, activeInteractions, discordID);
-
+  // check if user doesn't have any card
+  if (userCards.length === 0) {
+    await interaction.reply({
+      content: "Parece que não possui nenhuma carta! Use /b-card ou /b-pack para ganhar cartas!",
+    });
+    await wait(3000);
+    await interaction.deleteReply();
+    return;
+  }
+  // pagination
   let pageId = 1;
   const ItensPerPage = 3;
+  const totalPages = Math.ceil(userCards.length / ItensPerPage);
 
-  let cardsPerPage = await pagination(pageId, ItensPerPage, cardList);
-  const totalPages = Math.ceil(cardList.length / ItensPerPage);
+  let cardsPerPage = await Pagination(pageId, ItensPerPage, userCards);
 
-  const cardEmbed = await EmbedController.ShowUserCardList(
-    cardsPerPage,
-    cardsqty,
-    pageId,
-    totalPages
-  );
+  // show user cards
+  const userCardsEmbed = await EmbedController.ShowUserCards(cardsPerPage, pageId, totalPages);
   const navButtons = await ButtonController.NavButtons();
+
   await interaction.reply({
-    embeds: [cardEmbed],
+    embeds: [userCardsEmbed],
     components: [navButtons],
-    fetchReply: true,
-  });
+    fetchReply: true
+  })
 
-  // setting collector
-  const collector = interaction.channel.createMessageComponentCollector({
-    filter: (i) => i.user.id === discordID,
-    time: 24 * 60 * 60 * 1000, // 1 dia
-  });
-
-  // handling buttons
-  collector.on("collect", async (i) => {
-    // se o botao for next, muda para a proxima pagina
-    if (i.customId === "next") {
-      pageId = pageId >= totalPages ? 1 : pageId + 1; // Volta para a primeira página se for a última
-
-      cardsPerPage = await pagination(pageId, ItensPerPage, cardList);
-      const cardEmbed = await EmbedController.ShowUserCardList(
-        cardsPerPage,
-        cardsqty,
-        pageId,
-        totalPages
-      );
-      await i.update({
-        embeds: [cardEmbed],
-        ephemeral: true,
-        components: [navButtons],
-      });
-    }
-    // se o botao for previous, muda para a pagina anterior
-    else if (i.customId === "previous") {
-      pageId = pageId === 1 ? (pageId = totalPages) : (pageId = pageId - 1); // se a pagina for menor que 1, volta para a ultima
-      cardsPerPage = await pagination(pageId, ItensPerPage, cardList);
-      const cardEmbed = await EmbedController.ShowUserCardList(
-        cardsPerPage,
-        cardsqty,
-        pageId,
-        totalPages
-      );
-      await i.update({
-        embeds: [cardEmbed],
-        ephemeral: true,
-        components: [navButtons],
-      });
-    }
-    if (i.customId === "quit") {
-      activeInteractions.delete(discordID);
-      await i.update({
-        content: "Saida realizada com sucesso.",
-        embeds: [],
-        components: [],
-        ephemeral: true,
-      });
-      collector.stop();
-      await i.deleteReply();
-    }
-  });
+  CollectorController.MyCardsCollector(interaction, discordID, userCards, pageId, totalPages, navButtons, activeInteractions);
 }
-
 async function Collection(interaction, activeInteractions) {
   const discordID = interaction.user.id;
 
-  // Verificar se já existe uma interação ativa para este usuário
-  await checkActiveInteractions(discordID, activeInteractions);
+  const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
 
-  // Marcar a interação como ativa
-  activeInteractions.add(discordID);
+  if(isActiveInteractions === true)
+  {
+    return;
+  }
 
-  // Obter todas as cartas
+  // get all cards from collection
   const cards = await CardController.getAllCards();
 
-  // Inicializar variáveis de paginação
-  let pageId = 0; // Índice da página (0 para a primeira carta)
-  const totalCards = cards.length;
-
-  // Obter a carta atual
-  const currentCard = cards[pageId];
-
-  // Gerar embed para a carta atual
-  const cardEmbed = await EmbedController.ShowCard(
-    currentCard,
-    pageId + 1,
-    totalCards
-  );
-
-  // Gerar botões de navegação
-  const navButtons = await ButtonController.ShopButtons();
-
-  // Responder ao usuário com a primeira carta
-  await interaction.reply({
-    embeds: [cardEmbed],
-    components: [navButtons],
-    fetchReply: true,
-  });
-
-  // Configurar o coletor de interações de botões
-  const collector = interaction.channel.createMessageComponentCollector({
-    filter: (i) => i.user.id === discordID,
-    time: 24 * 60 * 60 * 1000, // 1 dia
-  });
-
-  // Manipular interações dos botões
-  collector.on("collect", async (i) => {
-    if (i.customId === "next") {
-      // Avançar para a próxima carta
-      pageId = (pageId + 1) % totalCards; // Retorna para a primeira carta se for a última
-    } else if (i.customId === "previous") {
-      // Voltar para a carta anterior
-      pageId = (pageId - 1 + totalCards) % totalCards; // Vai para a última carta se estiver na primeira
-    } else if (i.customId === "quit") {
-      // Encerrar a interação
-      activeInteractions.delete(discordID);
-      await i.update({
-        content: "Saída realizada com sucesso.",
-        embeds: [],
-        components: [],
-      });
-      collector.stop();
-      await wait(1000);
-      await i.deleteReply();
-      return;
-    }
-
-    // Obter a nova carta e atualizar o embed
-    const newCard = cards[pageId];
-    const cardEmbed = await EmbedController.ShowCard(
-      newCard,
-      pageId + 1,
-      totalCards
-    );
-
-    // Atualizar a mensagem com o novo embed
-    await i.update({
-      embeds: [cardEmbed],
-      components: [navButtons],
-      ephemeral: true,
-    });
-  });
+  // setting up 1 only
+  let pageId = 1;
+  const ItensPerPage = 1;
+  const totalPages = Math.ceil(cards.length / ItensPerPage);
+  
 }
-
 async function BuyCard(interaction) {
   const userId = interaction.user.id;
   const cardName = interaction.options.getString("card");
@@ -334,6 +209,7 @@ async function SellCard(interaction) {
   interaction.deleteReply();
 }
 async function BuyPack(interaction) {
+async function BuyPack(interaction) {
   const userid = interaction.user.id;
   const user = await User.findOne({ where: { discordID: userid } });
   const packName = interaction.options.getString("pack-name");
@@ -341,6 +217,7 @@ async function BuyPack(interaction) {
   const package = await PackageController.getPackageByName(packName);
   const buyGif = new AttachmentBuilder(`${img_folder}/buy.gif`);
 
+  if (!package) {
   if (!package) {
     await interaction.reply({
       content: "Pacote não encontrado!",

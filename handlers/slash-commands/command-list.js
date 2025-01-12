@@ -2,22 +2,20 @@ const {SlashCommandBuilder} = require('discord.js');
 module.exports = [
     /* Cards relational commands */
     // Open Package Command (Package Type, Package Quantity)
-    
-    
-    
-    // Check User Card List
+    // Show User Collection
     new SlashCommandBuilder()
-        .setName('my-cards')
-        .setDescription('Exibe os cards do seu inventário.'),
-    // Check Collection Card List
+        .setName("my-cards")
+        .setDescription("Exibe uma lista com todas as cartas do jogador"),
+    // Show Collection 
     new SlashCommandBuilder()
         .setName('collection')
-        .setDescription('Exibe os cards da colecção.'),
-    // Find card
+        .setDescription('Exibe uma lista com todas as cartas da colecção.'),
+    // Find card on collection
     new SlashCommandBuilder()
         .setName('f-card')
         .setDescription('Exibe os detalhes de um card da colecção.')
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para exibir os detalhes').setRequired(true)),
+
     /* User relational commands */
     // Shop list Command
     new SlashCommandBuilder()
@@ -28,6 +26,7 @@ module.exports = [
         .setName('b-card')
         .setDescription('Compra um item da loja.')            
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para comprar').setRequired(true)),
+    // Sell card Command
     // Sell Card Comman
     new SlashCommandBuilder()
         .setName('s-card')

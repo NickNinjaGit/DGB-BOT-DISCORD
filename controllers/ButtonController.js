@@ -6,15 +6,15 @@ module.exports = class ButtonController {
         const skillRow = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('skill1Details-f-card')
+                    .setCustomId('skill1Details')
                     .setLabel(`Detalhes de ${skill1}`)
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId('skill2Details-f-card')
+                    .setCustomId('skill2Details')
                     .setLabel(`Detalhes de ${skill2}`)
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId('quit-f-card')
+                    .setCustomId('quit')
                     .setLabel(`Sair`)
                     .setStyle(ButtonStyle.Danger),
             )
@@ -22,11 +22,11 @@ module.exports = class ButtonController {
         const backRow = new ActionRowBuilder()
             .addComponents(
                 new ButtonBuilder()
-                    .setCustomId('back-f-card')
+                    .setCustomId('back')
                     .setLabel('Voltar')
                     .setStyle(ButtonStyle.Success),
                 new ButtonBuilder()
-                    .setCustomId('quit-f-card')
+                    .setCustomId('quit')
                     .setLabel(`Sair`)
                     .setStyle(ButtonStyle.Danger),
             )
