@@ -26,6 +26,7 @@ module.exports = [
         .setName('b-card')
         .setDescription('Compra um item da loja.')            
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para comprar').setRequired(true)),
+    // Sell card Command
     // Buy Package Command
     new SlashCommandBuilder()
         .setName('b-pack')
