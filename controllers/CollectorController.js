@@ -48,7 +48,6 @@ module.exports = class CollectorController {
           fetchReply: true,
         });
         collector.stop();
-        await wait(500);
         await i.deleteReply();
       }
     });
@@ -97,7 +96,6 @@ module.exports = class CollectorController {
           components: [],
           fetchReply: true,
         });
-        await wait(1);
         await i.deleteReply();
       }
     });
@@ -138,7 +136,6 @@ module.exports = class CollectorController {
           components: [],
           fetchReply: true,
         });
-        await wait(500);
         await i.deleteReply();
       }
     });

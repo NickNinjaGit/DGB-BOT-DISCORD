@@ -2,7 +2,6 @@
 const EmbedController = require("../../controllers/EmbedController");
 const CollectorController = require("../../controllers/CollectorController");
 const CardController = require("../../controllers/CardController");
-const PackageController = require("../../controllers/PackageController");
 const ButtonController = require("../../controllers/ButtonController");
 const PackageController = require("../../controllers/PackageController");
 
@@ -57,7 +56,7 @@ async function friendProfile(interaction) {
       content: "Bots não possuem contas, seu engraçadinho.",
     });
     await wait(1000);
-    interaction.deleteReply();
+    await interaction.deleteReply();
     return;
   }
 
@@ -74,7 +73,7 @@ async function friendProfile(interaction) {
       content: "O usuário selecionado ainda não possui uma conta.",
     });
     await wait(1000);
-    interaction.deleteReply();
+    await interaction.deleteReply();
     return;
   } else {
     // Se o amigo tiver conta, exibe o perfil
@@ -86,7 +85,7 @@ async function friendProfile(interaction) {
       embeds: [friendProfileEmbed],
     });
     await wait(3000);
-    interaction.deleteReply();
+    await interaction.deleteReply();
   }
 }
 
@@ -115,8 +114,9 @@ async function Work(interaction) {
   user.wallet += moneyQty;
   await user.save();
 
-  // Responde o usuário com o dinheiro ganho.
-  await interaction.reply({
+  // Responde o usuário com o dinheiro ganho
+  await interaction.deferReply({ ephemeral: true });
+  await interaction.editReply({
     content: `Você ganhou ${moneyQty.toFixed(
       0
     )} 💸! Volte daqui 3 horas para trabalhar de novo!`,
@@ -124,7 +124,7 @@ async function Work(interaction) {
     ephemeral: true,
   });
   await wait(3000);
-  interaction.deleteReply();
+  await interaction.deleteReply();
 
   // Envia DM ao usuário após o cooldown
   await wait(cooldownTime);
@@ -165,14 +165,15 @@ async function Daily(interaction) {
   Daily_cooldown.set(discordID, Date.now() + cooldownTime);
 
   // Responde ao comando
-  await interaction.reply({
+  await interaction.deferReply({ ephemeral: true });
+  await interaction.editReply({
     content: `**Você ganhou ${moneyQty.toFixed(
       0
     )} 💸! Volte amanhã para coletar seu daily de novo!**`,
     files: [daily_gif],
   });
   await wait(3000);
-  interaction.deleteReply();
+  await interaction.deleteReply();
 
   // Envia DM ao usuário após o cooldown
   await wait(cooldownTime);

@@ -7,15 +7,18 @@ const CollectorController = require("../../controllers/CollectorController");
 
 // Models
 const User = require("../../models/User");
-
+const UserCards = require("../../models/UserCards");
 // validators
-const checkActiveInteractions = require("../validations/checkActiveInteractions");
 const cardExist = require("../validations/cardExist");
 const userHasCards = require("../validations/userHasCards");
 // helpers
 const wait = require("node:timers/promises").setTimeout;
 const checkActiveInteractions = require("../../helpers/checkActiveInteractions");
 const Pagination = require("../../helpers/pagination");
+
+const path = require("path");
+const img_folder = path.resolve(__dirname, "../../images/");
+const { AttachmentBuilder } = require("discord.js");
 
 
 /* Card Relational interactions */
@@ -128,7 +131,11 @@ async function BuyCard(interaction) {
   const buyGif = new AttachmentBuilder(`${img_folder}/buy.gif`);
 
   // check if card exists
-  await cardExist(card, interaction, userId);
+  const cardExists = await cardExist(card, interaction, userId);
+
+  if (cardExists === true) {
+    return;
+  }
 
   // check if user has enough money
   if (user.wallet < card.price) {
@@ -136,7 +143,7 @@ async function BuyCard(interaction) {
       content: "Dinheiro insuficiente!",
     });
     await wait(3000);
-    interaction.deleteReply();
+    await interaction.deleteReply();
     return;
   }
 
@@ -146,7 +153,7 @@ async function BuyCard(interaction) {
       content: "Inventario cheio!",
     });
     await wait(3000);
-    interaction.deleteReply();
+    await interaction.deleteReply();
     return;
   }
 
@@ -156,23 +163,23 @@ async function BuyCard(interaction) {
   user.inventory += 1;
   await user.save();
   await interaction.reply({
-    content: `Compra realizada com sucesso! **Use /fu-card para ver sua nova carta!**`,
+    content: `Compra realizada com sucesso! **Use /my-cards para ver sua nova carta!**`,
     files: [buyGif],
   });
   await wait(3000);
   interaction.deleteReply();
 }
 async function SellCard(interaction) {
-  const userId = interaction.user.id;
+  const discordID = interaction.user.id;
   const cardName = interaction.options.getString("card");
   const quantity = interaction.options.getInteger("quantity");
-  const user = await User.findOne({ where: { discordID: userId } });
+  const user = await User.findOne({ where: { discordID: discordID } });
   const card = await CardController.getCardByName(cardName);
 
   const sellGif = new AttachmentBuilder(`${img_folder}/sell.gif`);
 
   // check if card exists
-  await cardExist(card, interaction, userId);
+  await cardExist(card, interaction, discordID);
 
   // check if user has the card
   const userHasCard = await UserCards.findOne({
@@ -183,7 +190,7 @@ async function SellCard(interaction) {
       content: "Voce não possui essa carta",
     });
     await wait(3000);
-    interaction.deleteReply();
+    await interaction.deleteReply();
     return;
   }
 
@@ -193,12 +200,12 @@ async function SellCard(interaction) {
       content: "Você precisa ao menos de uma cópia da carta para vendê-la",
     });
     await wait(3000);
-    interaction.deleteReply();
+    await interaction.deleteReply();
     return;
   }
 
   // sell card
-  await CardController.SellCard(userId, cardName, quantity);
+  await CardController.SellCard(discordID, cardName, quantity);
   // get money add qty
   const moneyAdded = card.sellValue * quantity;
   await interaction.reply({
@@ -210,24 +217,25 @@ async function SellCard(interaction) {
 }
 
 async function BuyPack(interaction) {
-  const userid = interaction.user.id;
-  const user = await User.findOne({ where: { discordID: userid } });
+  const discordID = interaction.user.id;
+  const user = await User.findOne({ where: { discordID } });
   const packName = interaction.options.getString("pack-name");
   const qty = interaction.options.getInteger("quantity");
   const package = await PackageController.getPackageByName(packName);
   const buyGif = new AttachmentBuilder(`${img_folder}/buy.gif`);
 
-  if (!package) {
+  // check if package exists
   if (!package) {
     await interaction.reply({
       content: "Pacote não encontrado!",
     });
     await wait(3000);
-    interaction.deleteReply();
+    await interaction.deleteReply();
     return;
   }
 
-  if (user.wallet < package.price) {
+  console.log(user.wallet, package.price);
+  if (user.wallet <= package.price) {
     await interaction.reply({
       content:
         "Dinheiro insuficiente! Você possui apenas " + user.wallet + " 💸",
@@ -240,13 +248,13 @@ async function BuyPack(interaction) {
   // buy pack
   await PackageController.BuyPackage(user, package, qty);
 
+  // send message
   interaction.reply({
     content: `Pacote ${packName} comprado com sucesso! **Use o comando /o-package [nome do pacote] para abrir seu pacote!**`,
     files: [buyGif],
   });
-  await wait(3000);
+  await wait(5000);
   interaction.deleteReply();
-}
 }
 
 module.exports = { findCard, MyCards, Collection, BuyCard, SellCard, BuyPack };
