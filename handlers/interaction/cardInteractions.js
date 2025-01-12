@@ -208,7 +208,7 @@ async function SellCard(interaction) {
   await wait(3000);
   interaction.deleteReply();
 }
-async function BuyPack(interaction) {
+
 async function BuyPack(interaction) {
   const userid = interaction.user.id;
   const user = await User.findOne({ where: { discordID: userid } });
@@ -247,5 +247,6 @@ async function BuyPack(interaction) {
   await wait(3000);
   interaction.deleteReply();
 }
+}
 
-module.exports = { findCard, myCards, Collection, BuyCard, SellCard, BuyPack };
+module.exports = { findCard, MyCards, Collection, BuyCard, SellCard, BuyPack };
