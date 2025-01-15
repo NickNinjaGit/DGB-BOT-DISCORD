@@ -260,6 +260,7 @@ module.exports = class EmbedController {
       .setColor(card.rarity.color)
       .addFields({
         name: `Raridade: ${card.rarity.name}`,
+        value: `⠀`,
       })
       .addFields({
         name: `🌐⠀${card.universe}`,
