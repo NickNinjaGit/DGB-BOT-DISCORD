@@ -2,6 +2,14 @@ const {SlashCommandBuilder} = require('discord.js');
 module.exports = [
     /* Cards relational commands */
     // Open Package Command (Package Type, Package Quantity)
+    new SlashCommandBuilder()
+        .setName('o-pack')
+        .setDescription('Abre um pacote')
+        .addStringOption(option => 
+            option.setName('pack-name')
+                .setDescription('Selecione um pacote para abrir')
+                .setRequired(true)
+        ),
     // Show User Collection
     new SlashCommandBuilder()
         .setName("my-cards")

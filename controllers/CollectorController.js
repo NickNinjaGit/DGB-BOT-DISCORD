@@ -251,7 +251,6 @@ module.exports = class CollectorController {
         );
         await i.update({
           embeds: [shopEmbed],
-          ephemeral: true,
           components: [shopButtons],
         });
       }
@@ -268,7 +267,6 @@ module.exports = class CollectorController {
         );
         await i.update({
           embeds: [shopEmbed],
-          ephemeral: true,
           components: [shopButtons],
         });
       }

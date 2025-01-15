@@ -103,6 +103,65 @@ async function MyCards(interaction, activeInteractions) {
 
   CollectorController.MyCardsCollector(interaction, discordID, userCards, pageId, totalPages, navButtons, activeInteractions);
 }
+async function OpenPack(interaction) {
+  const discordID = interaction.user.id;
+  const user = await User.findOne({ where: { discordID } });
+  const packNameInput = interaction.options.getString("pack-name");
+  const userPackages = await PackageController.getUserPackages(user, packNameInput);
+
+
+  // check if package exists
+  if (!userPackages) {
+    await interaction.reply({
+      content: "Pacote não encontrado!",
+    });
+    await wait(3000);
+    await interaction.deleteReply();
+    return;
+  }
+  //check if user inventory is full
+  if(user.inventory === user.inventoryLimit)
+  {
+    await interaction.reply({
+      content: "Inventario cheio!",
+    });
+    await wait(3000);
+    await interaction.deleteReply();
+    return;
+  }
+  // check if user has enough packages
+  if (userPackages.qty < 1)
+  {
+    await interaction.reply({
+      content: "Quantidade de pacotes insuficiente!",
+    });
+    await wait(3000);
+    await interaction.deleteReply();
+    return;
+  }
+
+  // Open pack
+  const gainedCards = await PackageController.OpenPack(user, packNameInput);
+  if(gainedCards === true)
+    {
+      await interaction.reply({
+        content: "Impossível abrir o pacote com o invetário pequeno!",
+      });
+      await wait(3000);
+      await interaction.deleteReply();
+      return;
+    }
+  const packEmbed = await EmbedController.ShowPackCards(gainedCards);
+
+  
+  await interaction.reply({
+    embeds: packEmbed,
+    content: "Pacote aberto com sucesso! Não se esqueça que cartas repetidas podem ser vendidas!",
+    ephemeral: true, 
+    fetchReply: true
+  })
+
+}
 async function Collection(interaction, activeInteractions) {
   const discordID = interaction.user.id;
 
@@ -171,7 +230,7 @@ async function BuyCard(interaction) {
   }
 
   // buy card
-  await CardController.AddCard(userId, cardName);
+  await CardController.BuyCard(userId, cardName);
   user.wallet -= card.price;
   user.inventory += 1;
   await user.save();
@@ -248,7 +307,7 @@ async function BuyPack(interaction) {
   }
 
   console.log(user.wallet, package.price);
-  if (user.wallet <= package.price) {
+  if (user.wallet < package.price * qty) {
     await interaction.reply({
       content:
         "Dinheiro insuficiente! Você possui apenas " + user.wallet + " 💸",
@@ -270,4 +329,4 @@ async function BuyPack(interaction) {
   interaction.deleteReply();
 }
 
-module.exports = { findCard, MyCards, Collection, BuyCard, SellCard, BuyPack };
+module.exports = { findCard, MyCards, OpenPack, Collection, BuyCard, SellCard, BuyPack };

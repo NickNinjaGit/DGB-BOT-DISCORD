@@ -67,6 +67,9 @@ async function handleInteraction(interaction) {
       case "my-cards":
       await cardInteractions.MyCards(interaction, activeInteractions);
         break;
+      case "o-pack":
+      await cardInteractions.OpenPack(interaction);
+        break;
       case 'collection':
       await cardInteractions.Collection(interaction, activeInteractions);
         break;

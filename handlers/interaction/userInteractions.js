@@ -228,7 +228,6 @@ async function Shop(interaction, activeInteractions) {
   const shopButtons = await ButtonController.NavButtons();
   await interaction.reply({
     embeds: [shopEmbed],
-    ephemeral: true,
     components: [shopButtons],
   });
 

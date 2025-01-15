@@ -14,6 +14,11 @@ const Card = db.define("card", {
     required: true,
     allowNull: false,
   },
+  universe: {
+    type: DataTypes.STRING,
+    required: true,
+    allowNull: false,
+  },
   image: {
     type: DataTypes.STRING,
     required: true,

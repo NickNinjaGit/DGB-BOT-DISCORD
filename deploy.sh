@@ -13,4 +13,4 @@ cd "$REPO_DIR" || exit 1
 /usr/bin/git pull origin master
 
 #Mata o processo do npm capturando o processo e matando PID=$(pgrep -f "npm start") && kill-9 $PI D 
-#depois executa o nohup npm stat & 
+#depois executa o nohup npm start & 

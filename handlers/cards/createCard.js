@@ -6,6 +6,7 @@ const calculateImageHash = require('../../helpers/calculateImageHash');
 module.exports = async function createCard(
     name,
     description,
+    universe,
     isGif,
     image,
     rarity,
@@ -39,6 +40,7 @@ module.exports = async function createCard(
         const card = await Card.create({
             name,
             description,
+            universe,
             image, // URL da imagem no Cloudinary
             imageHash: hash, // Salva o hash no banco de dados
             rarity,
