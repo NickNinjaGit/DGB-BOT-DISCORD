@@ -131,15 +131,16 @@ module.exports = class PackageController {
       settings.rarityFilters = ["common", "rare", "epic", "legendary"];
     }
 
-    //check user has space in inventory
+    //  check user can recive cards (example: 12 > 15 - 8, 12 > 7, so true, user cant open this pack)
     if(user.inventory > user.inventoryLimit - settings.inventoryDelimiter) {
       return true;
     }
     pack.qty -= 1;
     await pack.save();
     const generatedCards = await CardController.AddCard(settings.quantityOutput, settings.rarityFilters);
-    //give cards to user
+    //for each generated card, give it to user
     for (let i = 0; i < generatedCards.length; i++) {
+      // check if user has card in inventory
       const hasCard = await UserCards.findOne({
         where: { userId: user.id, cardId: generatedCards[i].id },
       });
@@ -150,6 +151,7 @@ module.exports = class PackageController {
         await user.save();
         continue;
       }
+      // if not, associate user with current card data
       await UserCards.create({
         userId: user.id,
         cardId: generatedCards[i].id,

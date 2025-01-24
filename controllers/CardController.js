@@ -142,10 +142,11 @@ module.exports = class CardController {
     return userCard;
   }
   static async AddCard(x, pkgfilters = []) {
-    // sort random number between 1 and 1000
+    // defining some variables to generate random cards
     const min = 1;
     const max = 1000;
     const generatedCards = [];
+    // for each generated card, generate random rarity and check if rarity is include on pkgfilters
     for (let i = 0; i < x; i++) {
       const RNG = Math.floor(Math.random() * (max - min + 1) + min);
       let rarity = generateRandomRarity(RNG);
@@ -153,20 +154,25 @@ module.exports = class CardController {
       if (pkgfilters.includes(rarity)) {
         continue;
       }
+      // qyery all cards with the same generated rarity
       let cardList = await Card.findAll({ where: { rarity } });
       if (cardList.length === 0) {
         console.log(`Nenhuma carta encontrada para a raridade ${rarity}`);
         continue; // Pule essa iteração
       }
+      // get random card where rarity is the same
       const cardData = await Card.findOne({
         order: [Sequelize.fn("RAND")],
         where: { rarity },
         raw: true,
       });
+      // get skill1 and skill2 info to include on card object
       const skill1 = await Skill.findOne({ where: { id: cardData.SKILL1 } });
       const skill2 = await Skill.findOne({ where: { id: cardData.SKILL2 } });
+      // rarity info object for include detailed rarity to user
       const rarity_info = await CardController.checkRarity(cardData.rarity);
 
+      // create card object
       const card = {
         id: cardData.id,
         name: cardData.name,
@@ -186,7 +192,7 @@ module.exports = class CardController {
         skill2: skill2 ? skill2.dataValues : null, // Inclui os campos da skill2 no objeto
       };
 
-    
+      // push card to generatedCards array
       generatedCards.push(card);
     }
     return generatedCards;

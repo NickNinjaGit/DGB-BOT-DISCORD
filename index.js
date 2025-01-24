@@ -18,10 +18,11 @@ const UserCards = require("./models/UserCards");
 const Skill = require("./models/Skill");
 // handlers
 const handleInteraction = require("./handlers/interaction/interaction-handler.js");
-const loadCardCollection = require("./handlers/cards/cardList");
+const loadCards = require("./handlers/cards/cardList");
 
 // logger
-const logger = require("./logger")
+const logger = require("./logger");
+
 
 // Client settings
 const client = new Client({
@@ -38,7 +39,7 @@ client.once(Events.ClientReady, async (c) => {
   try {
     await conn.authenticate();
     await conn.sync({ force: false });
-    await loadCardCollection();
+    await loadCards();
 
     logger.info("Conexão com o banco de dados estabelecida com sucesso!");
   } catch (error) {

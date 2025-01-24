@@ -1,7 +1,11 @@
 const { EmbedBuilder } = require("discord.js");
+// Models
 const User = require("../models/User");
+// controllers
 const CardController = require("../controllers/CardController");
 const PackageController = require("../controllers/PackageController");
+
+// helpers
 const checkSkillType = require("../helpers/checkSkillType");
 
 module.exports = class EmbedController {
