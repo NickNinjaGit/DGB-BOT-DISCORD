@@ -324,3 +324,290 @@ Erro ao processar a interação: DiscordAPIError[10062]: Unknown interaction
   method: 'POST',
   url: 'https://discord.com/api/v10/interactions/1324197724001800234/aW50ZXJhY3Rpb246MTMyNDE5NzcyNDAwMTgwMDIzNDpyNndWMVJNd2trQ1NrRDZpUDRpRUxKMVZ4MVNFbUhvcWNuMExkelJKOHFhUHN4SUlzdDg2UjBzMVNOQ1dXQ3JpMjhlakhlZThWSWFKaGRVald2QzBBVzRqYnN1ZjdKNE9JU0ZCb25ka2t1enc2RHBTejJ4M2NqbFFQZ1pIbmxyaQ/callback'
 }
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
+Erro ao processar a interação: DiscordAPIError[10062]: Unknown interaction
+    at handleErrors (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:727:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BurstHandler.runRequest (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:831:23)
+    at async _REST.request (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:1272:22)
+    at async ChatInputCommandInteraction.reply (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:115:5)
+    at async Object.myProfile (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/handlers/interaction/interactionList.js:22:3)
+    at async handleInteraction (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/handlers/interaction-handler.js:34:9)
+    at async Client.<anonymous> (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/index.js:55:26) {
+  requestBody: { files: [], json: { type: 4, data: [Object] } },
+  rawError: { message: 'Unknown interaction', code: 10062 },
+  code: 10062,
+  status: 404,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1324416277875392522/aW50ZXJhY3Rpb246MTMyNDQxNjI3Nzg3NTM5MjUyMjppZnRKNEpRVDZoSzFmQXR6U0pXbEdTZWNHaGRVMWhSQ28xaWY2NmJqYTRzSUFDQ0lNVWNlUEJ5UElJcEJhRnYzSFNxVjhuOEZia2NRNm1TVUVGZzYycE1iOGNacGYwRVRhTWJWUDRPZjI1MG94M2FlaEVhQjNjUXhLUFJJYmN1NA/callback'
+}
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `name`, `description`, `image`, `imageHash`, `rarity`, `price`, `sellValue`, `tradable`, `HP`, `MANA`, `ATK`, `DEF`, `SPEED`, `SKILL1`, `SKILL2`, `createdAt`, `updatedAt` FROM `cards` AS `card` WHERE `card`.`name` = 'Fire Dragon';
+Executing (default): SELECT `id`, `name`, `description`, `image`, `imageHash`, `rarity`, `price`, `sellValue`, `tradable`, `HP`, `MANA`, `ATK`, `DEF`, `SPEED`, `SKILL1`, `SKILL2`, `createdAt`, `updatedAt` FROM `cards` AS `card` WHERE `card`.`name` = 'Fire Dragon';
+Executing (default): SELECT `id`, `name`, `description`, `image`, `imageHash`, `cost`, `SkillType`, `SkillValue`, `StatusChangeType`, `SkillMultiplier`, `acurracy`, `hitTimes`, `duration`, `createdAt`, `updatedAt`, `cardId` FROM `skills` AS `skill` WHERE `skill`.`id` = 1;
+Executing (default): SELECT `id`, `name`, `description`, `image`, `imageHash`, `cost`, `SkillType`, `SkillValue`, `StatusChangeType`, `SkillMultiplier`, `acurracy`, `hitTimes`, `duration`, `createdAt`, `updatedAt`, `cardId` FROM `skills` AS `skill` WHERE `skill`.`id` = 1;
+Executing (default): SELECT `id`, `name`, `description`, `image`, `imageHash`, `cost`, `SkillType`, `SkillValue`, `StatusChangeType`, `SkillMultiplier`, `acurracy`, `hitTimes`, `duration`, `createdAt`, `updatedAt`, `cardId` FROM `skills` AS `skill` WHERE `skill`.`id` = 2;
+Executing (default): SELECT `id`, `name`, `description`, `image`, `imageHash`, `cost`, `SkillType`, `SkillValue`, `StatusChangeType`, `SkillMultiplier`, `acurracy`, `hitTimes`, `duration`, `createdAt`, `updatedAt`, `cardId` FROM `skills` AS `skill` WHERE `skill`.`id` = 2;
+Card retornada: [object SequelizeInstance:card]
+Card retornada: [object SequelizeInstance:card]
+{
+  id: 1,
+  name: 'Fire Dragon',
+  description: 'A fire dragon',
+  image: 'https://res.cloudinary.com/dpa3l1hp6/image/upload/c_fill,g_auto,h_555,w_555/f_auto,q_auto/e_improve/wp48hztjqwbmwc0n6oyd?_a=BAMCkGTG0',
+  imageHash: '7ec17739b4d8220b0829b207d8a36c54bcf4237d31c9cd568f4149ab210f3886',
+  rarity: { name: 'Comum⠀🔵', color: 1002915 },
+  price: 150,
+  sellValue: 100,
+  tradable: true,
+  HP: 500,
+  MANA: 100,
+  ATK: 50,
+  DEF: 200,
+  SPEED: 30,
+  SKILL1: 1,
+  SKILL2: 2,
+  createdAt: 2024-12-31T18:28:19.000Z,
+  updatedAt: 2024-12-31T18:28:19.000Z,
+  skill1: {
+    id: 1,
+    name: 'Fire Blast',
+    description: 'A fire blast',
+    image: 'https://res.cloudinary.com/dpa3l1hp6/image/upload/c_fill,g_auto,h_555,w_555/f_auto,q_auto/e_improve/t5erthivuy9w6gzsbize.gif?_a=BAMCkGTG0',
+    imageHash: '4597911a05b0f767b244fd0d56253072d2fa60464062c0af50e4c238b11e41f3',
+    cost: 50,
+    SkillType: 'DAMAGE',
+    SkillValue: 200,
+    StatusChangeType: '',
+    SkillMultiplier: 0,
+    acurracy: 1,
+    hitTimes: 1,
+    duration: 0,
+    createdAt: 2024-12-31T18:28:17.000Z,
+    updatedAt: 2024-12-31T18:28:17.000Z,
+    cardId: null
+  },
+  skill2: {
+    id: 2,
+    name: 'Taunt',
+    description: 'Taunts the enemy',
+    image: 'https://res.cloudinary.com/dpa3l1hp6/image/upload/c_fill,g_auto,h_555,w_555/f_auto,q_auto/e_improve/zujoju1lhpuy10gb21ru.gif?_a=BAMCkGTG0',
+    imageHash: '816fe737e6c30ab4579a03512476d4068e7f130928287827198cafa6bb363d5a',
+    cost: 10,
+    SkillType: 'DEBUFF',
+    SkillValue: 0,
+    StatusChangeType: 'DEF',
+    SkillMultiplier: 0.5,
+    acurracy: 1,
+    hitTimes: 1,
+    duration: 2,
+    createdAt: 2024-12-31T18:28:18.000Z,
+    updatedAt: 2024-12-31T18:28:18.000Z,
+    cardId: null
+  }
+}
+{
+  id: 1,
+  name: 'Fire Dragon',
+  description: 'A fire dragon',
+  image: 'https://res.cloudinary.com/dpa3l1hp6/image/upload/c_fill,g_auto,h_555,w_555/f_auto,q_auto/e_improve/wp48hztjqwbmwc0n6oyd?_a=BAMCkGTG0',
+  imageHash: '7ec17739b4d8220b0829b207d8a36c54bcf4237d31c9cd568f4149ab210f3886',
+  rarity: { name: 'Comum⠀🔵', color: 1002915 },
+  price: 150,
+  sellValue: 100,
+  tradable: true,
+  HP: 500,
+  MANA: 100,
+  ATK: 50,
+  DEF: 200,
+  SPEED: 30,
+  SKILL1: 1,
+  SKILL2: 2,
+  createdAt: 2024-12-31T18:28:19.000Z,
+  updatedAt: 2024-12-31T18:28:19.000Z,
+  skill1: {
+    id: 1,
+    name: 'Fire Blast',
+    description: 'A fire blast',
+    image: 'https://res.cloudinary.com/dpa3l1hp6/image/upload/c_fill,g_auto,h_555,w_555/f_auto,q_auto/e_improve/t5erthivuy9w6gzsbize.gif?_a=BAMCkGTG0',
+    imageHash: '4597911a05b0f767b244fd0d56253072d2fa60464062c0af50e4c238b11e41f3',
+    cost: 50,
+    SkillType: 'DAMAGE',
+    SkillValue: 200,
+    StatusChangeType: '',
+    SkillMultiplier: 0,
+    acurracy: 1,
+    hitTimes: 1,
+    duration: 0,
+    createdAt: 2024-12-31T18:28:17.000Z,
+    updatedAt: 2024-12-31T18:28:17.000Z,
+    cardId: null
+  },
+  skill2: {
+    id: 2,
+    name: 'Taunt',
+    description: 'Taunts the enemy',
+    image: 'https://res.cloudinary.com/dpa3l1hp6/image/upload/c_fill,g_auto,h_555,w_555/f_auto,q_auto/e_improve/zujoju1lhpuy10gb21ru.gif?_a=BAMCkGTG0',
+    imageHash: '816fe737e6c30ab4579a03512476d4068e7f130928287827198cafa6bb363d5a',
+    cost: 10,
+    SkillType: 'DEBUFF',
+    SkillValue: 0,
+    StatusChangeType: 'DEF',
+    SkillMultiplier: 0.5,
+    acurracy: 1,
+    hitTimes: 1,
+    duration: 2,
+    createdAt: 2024-12-31T18:28:18.000Z,
+    updatedAt: 2024-12-31T18:28:18.000Z,
+    cardId: null
+  }
+}
+Erro ao processar a interação: DiscordAPIError[10062]: Unknown interaction
+    at handleErrors (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:727:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async BurstHandler.runRequest (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:831:23)
+    at async _REST.request (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:1272:22)
+    at async ChatInputCommandInteraction.reply (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:115:5)
+    at async Object.findCard (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/handlers/interaction/interactionList.js:126:3)
+    at async handleInteraction (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/handlers/interaction-handler.js:44:7)
+    at async Client.<anonymous> (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/index.js:55:26) {
+  requestBody: { files: [], json: { type: 4, data: [Object] } },
+  rawError: { message: 'Unknown interaction', code: 10062 },
+  code: 10062,
+  status: 404,
+  method: 'POST',
+  url: 'https://discord.com/api/v10/interactions/1324437818839138425/aW50ZXJhY3Rpb246MTMyNDQzNzgxODgzOTEzODQyNTozMXNZcE5OTEY4UThENGFGQjZyYkF3U0Z5Z1lxa3BqaDVoTXhpd1dIc3A3MFE1VG03RlZHTkh0RnVDbU5MSm13UlZXdUhic2hBNW9BQ2FPWEpjdUxJNWtjbGJQWGF2WXMyaHBqTGtPa0xHT3hCTFdUSGlOaHVOYjkyVWxqNkFCWA/callback'
+}
+/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:727
+      throw new DiscordAPIError(data, "code" in data ? data.code : data.error, status, method, url, requestData);
+            ^
+
+DiscordAPIError[10008]: Unknown Message
+    at handleErrors (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:727:13)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async SequentialHandler.runRequest (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:1128:23)
+    at async SequentialHandler.queueRequest (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:959:14)
+    at async _REST.request (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/@discordjs/rest/dist/index.js:1272:22)
+    at async InteractionWebhook.editMessage (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/discord.js/src/structures/Webhook.js:341:15)
+    at async ChatInputCommandInteraction.editReply (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/node_modules/discord.js/src/structures/interfaces/InteractionResponses.js:162:17)
+    at async InteractionCollector.<anonymous> (/home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD/handlers/interaction/interactionList.js:178:5) {
+  requestBody: {
+    files: [],
+    json: {
+      content: '**Tempo limite excedido, interação cancelada.**',
+      tts: false,
+      nonce: undefined,
+      enforce_nonce: false,
+      embeds: [],
+      components: [],
+      username: undefined,
+      avatar_url: undefined,
+      allowed_mentions: undefined,
+      flags: 64,
+      message_reference: undefined,
+      attachments: undefined,
+      sticker_ids: undefined,
+      thread_name: undefined,
+      applied_tags: undefined,
+      poll: undefined
+    }
+  },
+  rawError: { message: 'Unknown Message', code: 10008 },
+  code: 10008,
+  status: 404,
+  method: 'PATCH',
+  url: 'https://discord.com/api/v10/webhooks/1318722761274691654/aW50ZXJhY3Rpb246MTMyNDQzNzgxODgzOTEzODQyNTozMXNZcE5OTEY4UThENGFGQjZyYkF3U0Z5Z1lxa3BqaDVoTXhpd1dIc3A3MFE1VG03RlZHTkh0RnVDbU5MSm13UlZXdUhic2hBNW9BQ2FPWEpjdUxJNWtjbGJQWGF2WXMyaHBqTGtPa0xHT3hCTFdUSGlOaHVOYjkyVWxqNkFCWA/messages/@original'
+}
+
+Node.js v22.12.0
+npm verbose cwd /home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD
+npm verbose os Linux 6.1.21-v8+
+npm verbose node v22.12.0
+npm verbose npm  v10.9.0
+npm verbose exit 1
+npm verbose code 1
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' AND `user`.`isAdmin` = true LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1186129400475943024' LIMIT 1;
+Executing (default): INSERT INTO `users` (`id`,`discordID`,`name`,`wallet`,`Daily`,`alreadyWorked`,`inventory`,`inventoryLimit`,`BattlesWon`,`BattlesLost`,`BattlesGiveUp`,`IsInBattle`,`IsAdmin`,`BasicPackageQty`,`AdvancedPackageQty`,`PremiumPackageQty`,`createdAt`,`updatedAt`) VALUES (DEFAULT,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1186129400475943024' LIMIT 1;
+Executing (default): SELECT `id`, `name`, `description`, `image`, `imageHash`, `rarity`, `price`, `sellValue`, `tradable`, `HP`, `MANA`, `ATK`, `DEF`, `SPEED`, `SKILL1`, `SKILL2`, `createdAt`, `updatedAt` FROM `cards` AS `card` WHERE `card`.`name` = 'Fire Dragon';
+Executing (default): SELECT `id`, `name`, `description`, `image`, `imageHash`, `cost`, `SkillType`, `SkillValue`, `StatusChangeType`, `SkillMultiplier`, `acurracy`, `hitTimes`, `duration`, `createdAt`, `updatedAt`, `cardId` FROM `skills` AS `skill` WHERE `skill`.`id` = 1;
+Executing (default): SELECT `id`, `name`, `description`, `image`, `imageHash`, `cost`, `SkillType`, `SkillValue`, `StatusChangeType`, `SkillMultiplier`, `acurracy`, `hitTimes`, `duration`, `createdAt`, `updatedAt`, `cardId` FROM `skills` AS `skill` WHERE `skill`.`id` = 2;
+Card retornada: [object SequelizeInstance:card]
+{
+  id: 1,
+  name: 'Fire Dragon',
+  description: 'A fire dragon',
+  image: 'https://res.cloudinary.com/dpa3l1hp6/image/upload/c_fill,g_auto,h_555,w_555/f_auto,q_auto/e_improve/wp48hztjqwbmwc0n6oyd?_a=BAMCkGTG0',
+  imageHash: '7ec17739b4d8220b0829b207d8a36c54bcf4237d31c9cd568f4149ab210f3886',
+  rarity: { name: 'Comum⠀🔵', color: 1002915 },
+  price: 150,
+  sellValue: 100,
+  tradable: true,
+  HP: 500,
+  MANA: 100,
+  ATK: 50,
+  DEF: 200,
+  SPEED: 30,
+  SKILL1: 1,
+  SKILL2: 2,
+  createdAt: 2024-12-31T18:28:19.000Z,
+  updatedAt: 2024-12-31T18:28:19.000Z,
+  skill1: {
+    id: 1,
+    name: 'Fire Blast',
+    description: 'A fire blast',
+    image: 'https://res.cloudinary.com/dpa3l1hp6/image/upload/c_fill,g_auto,h_555,w_555/f_auto,q_auto/e_improve/t5erthivuy9w6gzsbize.gif?_a=BAMCkGTG0',
+    imageHash: '4597911a05b0f767b244fd0d56253072d2fa60464062c0af50e4c238b11e41f3',
+    cost: 50,
+    SkillType: 'DAMAGE',
+    SkillValue: 200,
+    StatusChangeType: '',
+    SkillMultiplier: 0,
+    acurracy: 1,
+    hitTimes: 1,
+    duration: 0,
+    createdAt: 2024-12-31T18:28:17.000Z,
+    updatedAt: 2024-12-31T18:28:17.000Z,
+    cardId: null
+  },
+  skill2: {
+    id: 2,
+    name: 'Taunt',
+    description: 'Taunts the enemy',
+    image: 'https://res.cloudinary.com/dpa3l1hp6/image/upload/c_fill,g_auto,h_555,w_555/f_auto,q_auto/e_improve/zujoju1lhpuy10gb21ru.gif?_a=BAMCkGTG0',
+    imageHash: '816fe737e6c30ab4579a03512476d4068e7f130928287827198cafa6bb363d5a',
+    cost: 10,
+    SkillType: 'DEBUFF',
+    SkillValue: 0,
+    StatusChangeType: 'DEF',
+    SkillMultiplier: 0.5,
+    acurracy: 1,
+    hitTimes: 1,
+    duration: 2,
+    createdAt: 2024-12-31T18:28:18.000Z,
+    updatedAt: 2024-12-31T18:28:18.000Z,
+    cardId: null
+  }
+}
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordID` = '1048239112274055219' LIMIT 1;
+Executing (default): SELECT `id`, `discordID`, `name`, `wallet`, `Daily`, `alreadyWorked`, `inventory`, `inventoryLimit`, `BattlesWon`, `BattlesLost`, `BattlesGiveUp`, `IsInBattle`, `IsAdmin`, `BasicPackageQty`, `AdvancedPackageQty`, `PremiumPackageQty`, `createdAt`, `updatedAt` FROM `users` AS `user` WHERE `user`.`discordId` = '1048239112274055219' LIMIT 1;
