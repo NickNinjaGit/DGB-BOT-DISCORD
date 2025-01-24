@@ -9,7 +9,7 @@ if [ -n "$changes" ]; then
     echo "Uma alteração foi feita"
 
     git pull
-    PID=${$(pgrep -f "npm start")}
+    PID=$(pgrep -f "npm start")
     if [ -n "$PID" ]; then
         kill -9 $PID
         echo "processo npm encerrado"
