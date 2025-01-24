@@ -1,7 +1,7 @@
 const User = require("./User");
-const Card = require("./Card");
 const { DataTypes } = require("sequelize");
 const db = require("../db/conn");
+const Card = require("./Card");
 
 const UserCards = db.define("usercards", {
     userId: {
@@ -24,25 +24,33 @@ const UserCards = db.define("usercards", {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    starPoints: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+    },
+    currentIMG: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     currentHP: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: Card.HP,
+    },
+    currentMANA: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
     },
     currentATK: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: Card.ATK,
     },
     currentDEF: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: Card.DEF,
     },
     currentSPEED: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        defaultValue: Card.SPEED,
     },
 });
 

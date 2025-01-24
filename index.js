@@ -13,14 +13,16 @@ const conn = require("./db/conn");
 // models
 const Card = require("./models/Card");
 const User = require("./models/User");
+const Package = require("./models/Package");
 const UserCards = require("./models/UserCards");
 const Skill = require("./models/Skill");
 // handlers
-const handleInteraction = require("./handlers/interaction-handler.js");
-const loadCardCollection = require("./handlers/cards/cardList");
+const handleInteraction = require("./handlers/interaction/interaction-handler.js");
+const loadCards = require("./handlers/cards/cardList");
 
 // logger
-const logger = require("./logger")
+const logger = require("./logger");
+
 
 // Client settings
 const client = new Client({
@@ -36,8 +38,8 @@ client.once(Events.ClientReady, async (c) => {
 
   try {
     await conn.authenticate();
-    await conn.sync();
-    await loadCardCollection();
+    await conn.sync({ force: false });
+    await loadCards();
 
     logger.info("Conexão com o banco de dados estabelecida com sucesso!");
   } catch (error) {
@@ -45,6 +47,7 @@ client.once(Events.ClientReady, async (c) => {
   }
 
   CommandHandler.registerCommands();
+  //CommandHandler.deleteCommands();
 });
 
 // logs gerais

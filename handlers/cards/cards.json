@@ -1,0 +1,20 @@
+[
+    {
+        "name": "Fire Dragon",
+        "description": "A fire dragon",
+        "universe": "Cuphead",
+        "image": "https://static.wikia.nocookie.net/cuphead7697/images/b/be/Grim_match_na_primeira_fase_%27O%27.png/revision/latest?cb=20180106011657&path-prefix=pt-br",
+        "rarity": "common",
+        "price": 150,
+        "sellValue": 100,
+        "tradable": true,
+        "HP": 500,
+        "MANA": 100,
+        "ATK": 50,
+        "DEF": 200,
+        "SPEED": 30,
+        "SKILL1": "Fire Blast",
+        "SKILL2": "Taunt"
+    }
+
+]

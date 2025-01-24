@@ -7,9 +7,14 @@ const Card = db.define("card", {
     type: DataTypes.STRING,
     required: true,
     allowNull: false,
-    unique: true,
+    unique: "card_name_index",
   },
   description: {
+    type: DataTypes.STRING,
+    required: true,
+    allowNull: false,
+  },
+  universe: {
     type: DataTypes.STRING,
     required: true,
     allowNull: false,
@@ -23,7 +28,7 @@ const Card = db.define("card", {
     type: DataTypes.STRING,
     required: true,
     allowNull: false,
-    unique: true,
+    unique: "card_image_index",
   },
   rarity: {
     type: DataTypes.STRING,
@@ -91,8 +96,5 @@ const Card = db.define("card", {
     },
   },
 });
-
-Card.hasMany(Skill);
-Skill.belongsTo(Card);
 
 module.exports = Card;

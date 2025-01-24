@@ -1,25 +1,43 @@
-const skillList = require('../skills/skillList');
+const loadSkills = require('../skills/skillList');
+const fs = require('fs');
+const path = require('path');
 const createCard  = require('./createCard');
-async function loadCardCollection() {
-    const { fireBlast, taunt } = await skillList();
-    const fireDragon = await createCard(
-        "Fire Dragon", // Name
-        "A fire dragon", // Description
-        false, // Is Gif
-        "https://static.wikia.nocookie.net/cuphead7697/images/b/be/Grim_match_na_primeira_fase_%27O%27.png/revision/latest?cb=20180106011657&path-prefix=pt-br", // Image
-        "common", // Rarity
-        150, // Price
-        100, // SellValue
-        true, // Tradable
-        500, // HP
-        100, // MANA
-        50, // ATK
-        200, // DEF
-        30, // SPEED
-        fireBlast.id, // SKILL1
-        taunt.id // SKILL2
-    );
-    return { fireDragon }
+
+// Skill model
+const Skill = require('../../models/Skill');
+
+async function loadCards() {
+    
+    const file = fs.readFileSync(path.resolve(__dirname, "./cards.json"));
+    const cardsData = JSON.parse(file);
+    const cards = [];
+    await loadSkills();
+    for (const cardData of cardsData) {
+        const SKILL1 = await Skill.findOne({ where: { name: cardData.SKILL1 } });
+        const SKILL2 = await Skill.findOne({ where: { name: cardData.SKILL2 } });
+        const card = await createCard(
+            cardData.name,
+            cardData.description,
+            cardData.universe,
+            cardData.isGif,
+            cardData.image,
+            cardData.rarity,
+            cardData.price,
+            cardData.sellValue,
+            cardData.tradable,
+            cardData.HP,
+            cardData.MANA,
+            cardData.ATK,
+            cardData.DEF,
+            cardData.SPEED,
+            SKILL1.id,
+            SKILL2.id
+        );
+        cards.push(card);
+    }
+
+    return cards;
+   
 }
 
-module.exports = loadCardCollection;
+module.exports = loadCards;

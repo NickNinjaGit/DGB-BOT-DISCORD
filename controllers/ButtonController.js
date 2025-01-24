@@ -33,4 +33,42 @@ module.exports = class ButtonController {
 
         return {skillRow, backRow};
     }
+    static async ProfileButtons()
+    {
+        const profileRow = new ActionRowBuilder()
+        .addComponents(
+            new ButtonBuilder()
+                .setCustomId('user-info')
+                .setLabel(`Estátisticas`)
+                .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+                .setCustomId('pack-info')
+                .setLabel(`Inventário de Pacotes`)
+                .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+                .setCustomId('quit')
+                .setLabel(`Sair`)
+                .setStyle(ButtonStyle.Danger),
+        )
+        return profileRow   
+    }
+    static async NavButtons()
+    {
+        const navRow = new ActionRowBuilder()
+        .addComponents(
+            new ButtonBuilder()
+                .setCustomId('previous')
+                .setLabel(`<-`)
+                .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+                .setCustomId('next')
+                .setLabel(`->`)
+                .setStyle(ButtonStyle.Success),
+            new ButtonBuilder()
+                .setCustomId('quit')
+                .setLabel(`Sair`)
+                .setStyle(ButtonStyle.Danger),
+        )
+        return navRow
+    }
 }

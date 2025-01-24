@@ -6,7 +6,7 @@ const Skill = db.define('skill', {
         type: DataTypes.STRING,
         required: true,
         allowNull: false,
-        unique: true,
+        unique: "skill_name_index",
     },
     description: {
         type: DataTypes.STRING,
@@ -22,7 +22,7 @@ const Skill = db.define('skill', {
         type: DataTypes.STRING,
         required: true,
         allowNull: false,
-        unique: true,
+        unique: "skill_image_index",
     },
     cost: {
         type: DataTypes.INTEGER,
