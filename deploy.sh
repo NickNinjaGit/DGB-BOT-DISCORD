@@ -1,11 +1,13 @@
 #!/bin/bash
-##Alteração de testes
+
 
 ##script para checa se o repositorio teve alteração (git log --since="1 minute ago"), caso sim faz o pull, caso não encerra o script. 
 changes=$(git log --since="1 minute ago")
 
 if [ -n "$changes" ]; then
     echo "Uma alteração foi feita"
+
+    git pull 
     PID=${$(pgrep -f "npm start")}
     if [ -n "$PID" ]; then
         kill -9 $PID
