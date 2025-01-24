@@ -8,15 +8,13 @@ changes=$(git log --since="1 minute ago")
 if [ -n "$changes" ]; then
     echo "Uma alteração foi feita"
 
-    git pull 
+    git pull
     PID=${$(pgrep -f "npm start")}
     if [ -n "$PID" ]; then
         kill -9 $PID
         echo "processo npm encerrado"
     fi
-    
     nohup npm start &
-    
 else
     echo "Nenhuma alteração foi feita"
     exit 0
