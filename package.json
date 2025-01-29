@@ -14,7 +14,7 @@
   "dependencies": {
     "cloudinary": "^2.5.1",
     "crypto": "^1.0.1",
-    "discord.js": "^14.16.3",
+    "discord.js": "^14.14.1",
     "dotenv": "^16.4.7",
     "mysql2": "^3.11.5",
     "sequelize": "^6.37.5",
