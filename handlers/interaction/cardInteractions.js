@@ -56,7 +56,7 @@ async function findCard(interaction, activeInteractions) {
     components: [skillDetails.skillRow],
     fetchReply: true,
   });
-
+  activeInteractions.add(discordID);
   CollectorController.CardCollector(interaction, discordID, card, cardEmbed, skillDetails, activeInteractions);
 
 
@@ -100,7 +100,7 @@ async function MyCards(interaction, activeInteractions) {
     components: [navButtons],
     fetchReply: true
   })
-
+  activeInteractions.add(discordID);
   CollectorController.MyCardsCollector(interaction, discordID, userCards, pageId, totalPages, navButtons, activeInteractions);
 }
 async function OpenPack(interaction) {
@@ -191,7 +191,7 @@ async function Collection(interaction, activeInteractions) {
     components: [navButtons],
     fetchReply: true
   })
-
+  activeInteractions.add(discordID);
   CollectorController.CollectionController(interaction, discordID, currentCardIndex, navButtons, activeInteractions)
 }
 async function BuyCard(interaction) {
@@ -329,4 +329,52 @@ async function BuyPack(interaction) {
   interaction.deleteReply();
 }
 
-module.exports = { findCard, MyCards, OpenPack, Collection, BuyCard, SellCard, BuyPack };
+async function SetStardom(interaction, activeInteractions) {
+    const discordID = interaction.user.id;
+    const user = await User.findOne({ where: { discordID } });
+    const cardInput = interaction.options.getString("card");
+
+    // check active interactions
+    const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
+   
+
+    if (isActiveInteractions === true) {
+        return;
+    }
+
+    const card = await CardController.getCardByName(cardInput);
+    const userCard = await UserCards.findOne({ where: { userId: user.id, cardId: card.id } });
+    const cardName = card.name;
+    const starPoints = userCard.starPoints;
+    const currentIMG = userCard.currentIMG;
+
+    if(!userCard) {
+       await interaction.reply({
+           content: "Você não possui essa carta ou ela não existe!",
+       })
+       await wait(1000);
+       await interaction.deleteReply();
+       return;
+    }
+
+    // set stardom 
+    const stardomTier = await CardController.checkStardomTier(userCard);
+
+    
+    // embed
+    const stardomSettings = await EmbedController.StardomSettings(stardomTier, starPoints, cardName, currentIMG);
+    const stardomButtons = (await ButtonController.StardomButtons(starPoints)).stardomRow;
+    const quitButton = (await ButtonController.StardomButtons()).quitRow;
+
+
+    await interaction.reply({
+      embeds: [stardomSettings],
+      components: [stardomButtons, quitButton],
+      fetchReply: true,
+    });
+    activeInteractions.add(discordID);
+
+    // collector
+    await CollectorController.StardomCollector(interaction, discordID, card, userCard, stardomButtons, quitButton, activeInteractions);
+}
+module.exports = { findCard, MyCards, OpenPack, Collection, BuyCard, SellCard, BuyPack, SetStardom };

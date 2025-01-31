@@ -8,6 +8,61 @@ const UserCards = require("../models/UserCards");
 const generateRandomRarity = require("../helpers/generateRandomRarity");
 
 module.exports = class CardController {
+  static async checkRarity(rarity) {
+    const COMMON = "common";
+    const RARE = "rare";
+    const EPIC = "epic";
+    const LEGENDARY = "legendary";
+    const MYTHIC = "mythic";
+    return rarity === COMMON
+      ? { name: "Comum⠀🔵", color: 0x0f4da3 }
+      : rarity === RARE
+      ? { name: "Raro⠀🟢", color: 0x32e656 }
+      : rarity === EPIC
+      ? { name: "Épico⠀🟣", color: 0x8f32e6 }
+      : rarity === LEGENDARY
+      ? { name: "Lendário⠀🟠", color: 0xed6905 }
+      : rarity === MYTHIC
+      ? { name: "Mítico⠀🔴", color: 0xd41c1c }
+      : "Não definida";
+  }
+
+  static async checkStardomTier(userCard)
+  {
+    const starPoints = userCard.starPoints;
+    const stardomTier = userCard.stardomTier;
+    if(starPoints >= 10 && starPoints <= 49)
+    {
+      userCard.stardomTier = "Bronze⠀🧡";
+      userCard.save();
+    }
+    if(starPoints >= 50 && starPoints <= 99)
+    {
+      userCard.stardomTier = "Prata⠀🤍";
+      userCard.save();
+    }
+    if(starPoints >= 100 && starPoints <= 199)
+    {
+      userCard.stardomTier = "Ouro⠀💛";
+      userCard.save();
+    }
+    if(starPoints >= 200)
+    {
+      userCard.stardomTier = "Ascendente⠀💜";
+      userCard.save();
+    }
+
+    return stardomTier;
+  }
+  static async ChangeStardomImage(userCard, card, url_changer)
+  {
+    const startURL = card.image.slice(0, 89);
+    const endURL = card.image.slice(90, userCard.currentIMG.length);
+    const updatedImage = startURL + url_changer + endURL;
+    userCard.currentIMG = updatedImage;
+    await userCard.save();
+    return updatedImage;
+  }
   static async getCardByName(name) {
     const card = await Card.findOne({
       where: { name: { [Op.like]: `%${name}%` } },
@@ -94,25 +149,6 @@ module.exports = class CardController {
     return { cardsQty, lastCard };
   }
 
-  static async checkRarity(rarity) {
-    const COMMON = "common";
-    const RARE = "rare";
-    const EPIC = "epic";
-    const LEGENDARY = "legendary";
-    const MYTHIC = "mythic";
-    return rarity === COMMON
-      ? { name: "Comum⠀🔵", color: 0x0f4da3 }
-      : rarity === RARE
-      ? { name: "Raro⠀🟢", color: 0x32e656 }
-      : rarity === EPIC
-      ? { name: "Épico⠀🟣", color: 0x8f32e6 }
-      : rarity === LEGENDARY
-      ? { name: "Lendário⠀🟠", color: 0xed6905 }
-      : rarity === MYTHIC
-      ? { name: "Mítico⠀🔴", color: 0xd41c1c }
-      : "Não definida";
-  }
-
   static async BuyCard(discordID, cardName) {
     const user = await User.findOne({ where: { discordID } });
     const card = await Card.findOne({
@@ -132,6 +168,7 @@ module.exports = class CardController {
       cardId: card.id,
       quantity: 0,
       starPoints: 0,
+      stardomTier: "N/A",
       currentIMG: card.image,
       currentHP: card.HP,
       currentMANA: card.MANA,
@@ -214,23 +251,5 @@ module.exports = class CardController {
       }
     }
     await user.save();
-  }
-  static async checkRarity(rarity) {
-    const COMMON = "common";
-    const RARE = "rare";
-    const EPIC = "epic";
-    const LEGENDARY = "legendary";
-    const MYTHIC = "mythic";
-    return rarity === COMMON
-      ? { name: "Comum⠀🔵", color: 0x0f4da3 }
-      : rarity === RARE
-      ? { name: "Raro⠀🟢", color: 0x32e656 }
-      : rarity === EPIC
-      ? { name: "Épico⠀🟣", color: 0x8f32e6 }
-      : rarity === LEGENDARY
-      ? { name: "Lendário⠀🟠", color: 0xed6905 }
-      : rarity === MYTHIC
-      ? { name: "Mítico⠀🔴", color: 0xd41c1c }
-      : "Não definida";
   }
 };
