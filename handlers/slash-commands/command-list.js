@@ -23,7 +23,11 @@ module.exports = [
         .setName('f-card')
         .setDescription('Exibe os detalhes de um card da colecção.')
         .addStringOption(option => option.setName('card').setDescription('Selecione um card para exibir os detalhes').setRequired(true)),
-
+    // Set default Stardom Command
+    new SlashCommandBuilder()
+        .setName("stardom")
+        .setDescription("Defina a imagem de estrelato para de um card.")
+        .addStringOption(option => option.setName('card').setDescription('Selecione o card que deseje configurar a imagem de estrelato').setRequired(true)),
     /* User relational commands */
     // Shop list Command
     new SlashCommandBuilder()

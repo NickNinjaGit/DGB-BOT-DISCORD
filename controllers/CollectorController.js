@@ -123,46 +123,46 @@ module.exports = class CollectorController {
       filter: (i) => i.user.id === discordID,
       time: 600000, // 10 minutos
     });
-  
+
     const cards = await CardController.getAllCards();
-  
+
     collector.on("collect", async (i) => {
       if (i.customId === "next") {
         // Atualiza o índice, garantindo que ele não ultrapasse os limites
         currentCardIndex = (currentCardIndex + 1) % cards.length;
-  
+
         const currentCard = cards[currentCardIndex];
         const CollectionEmbed = await EmbedController.ShowCollection(
           currentCard,
           currentCardIndex + 1, // Índice atual +1 para exibir como posição
           cards.length
         );
-  
+
         await i.update({
           embeds: [CollectionEmbed],
           components: [navButtons],
           fetchReply: true,
         });
       }
-  
+
       if (i.customId === "previous") {
         // Atualiza o índice, garantindo que ele não fique negativo
         currentCardIndex = (currentCardIndex - 1 + cards.length) % cards.length;
-  
+
         const currentCard = cards[currentCardIndex];
         const CollectionEmbed = await EmbedController.ShowCollection(
           currentCard,
           currentCardIndex + 1, // Índice atual +1 para exibir como posição
           cards.length
         );
-  
+
         await i.update({
           embeds: [CollectionEmbed],
           components: [navButtons],
           fetchReply: true,
         });
       }
-  
+
       if (i.customId === "quit") {
         activeInteractions.delete(discordID);
         collector.stop();
@@ -175,7 +175,7 @@ module.exports = class CollectorController {
       }
     });
   }
-  
+
   static async ProfileCollector(
     interaction,
     discordID,
@@ -283,4 +283,99 @@ module.exports = class CollectorController {
       }
     });
   }
+  static async StardomCollector(
+    interaction,
+    discordID,
+    card,
+    userCard,
+    stardomButtons,
+    quitButton,
+    activeInteractions
+  ) {
+    const collector = interaction.channel.createMessageComponentCollector({
+      filter: (i) => i.user.id === discordID,
+      time: 600000, // 10 minuto
+    });
+
+    // Configurar o coletor para ouvir interações nos botões
+    collector.on("collect", async (i) => {
+      let updatedImage;
+
+      if (i.customId === "stardom-default") {
+        userCard.currentIMG = card.image;
+        updatedImage = card.image;
+        await userCard.save();
+        i.update({
+          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "Moldura Padrão aplicada.")],
+          components: [stardomButtons, quitButton],
+        });
+        return;
+      }
+
+      if (i.customId === "stardom-bronze") {
+        updatedImage = await CardController.ChangeStardomImage(
+          userCard,
+          card,
+          "/e_sepia/e_colorize:30,co_rgb:ff7700/bo_5px_solid_rgb:ff8000/"
+        );
+        i.update({
+          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "✅Moldura de bronze aplicada.✅")],
+          components: [stardomButtons, quitButton],
+        });
+        return;
+      }
+
+      if (i.customId === "stardom-silver") {
+        updatedImage = await CardController.ChangeStardomImage(
+          userCard,
+          card,
+          "/e_sepia/e_colorize:30,co_rgb:8a8680/bo_5px_solid_rgb:8a8680/"
+        );
+        i.update({
+          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "✅Moldura de prata aplicada.✅")],
+          components: [stardomButtons, quitButton],
+        });
+        return;
+      }
+      if (i.customId === "stardom-gold") {
+        updatedImage = await CardController.ChangeStardomImage(
+          userCard,
+          card,
+          "/e_sepia/e_colorize:30,co_rgb:fff700/bo_5px_solid_rgb:fff700/"
+        );
+        i.update({
+          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "✅Moldura de ouro aplicada.✅")],
+          components: [stardomButtons, quitButton],
+        });
+        return;
+      }
+      if (i.customId === "stardom-iridium") {
+        updatedImage = await CardController.ChangeStardomImage(
+          userCard,
+          card,
+          "/e_sepia/e_colorize:30,co_rgb:ff00e1/bo_5px_solid_rgb:883db8/"
+        );
+        i.update({
+          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "✅Moldura de irídio aplicada.✅")],
+          components: [stardomButtons, quitButton],
+        });
+        return;
+      }
+
+
+
+      if (i.customId === "quit") {
+        activeInteractions.delete(discordID);
+        collector.stop();
+        await i.update({
+          content: "Interação finalizada.",
+          components: [],
+        });
+        await i.deleteReply();
+        return;
+      }
+    });
+  }
 };
+
+

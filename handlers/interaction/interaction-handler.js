@@ -9,7 +9,6 @@ const wait = require("node:timers/promises").setTimeout;
 //active interactions
 const activeInteractions = new Set();
 async function handleInteraction(interaction) {
-
   const commandName = interaction.commandName;
 
   if (!interaction.isChatInputCommand()) return;
@@ -50,6 +49,20 @@ async function handleInteraction(interaction) {
       case "shop":
         await userInteractions.Shop(interaction, activeInteractions);
         break;
+
+      // card relational commands
+      case "f-card":
+        await cardInteractions.findCard(interaction, activeInteractions);
+        break;
+      case "my-cards":
+        await cardInteractions.MyCards(interaction, activeInteractions);
+        break;
+      case "o-pack":
+        await cardInteractions.OpenPack(interaction);
+        break;
+      case "collection":
+        await cardInteractions.Collection(interaction, activeInteractions);
+        break;
       case "b-card":
         await cardInteractions.BuyCard(interaction);
         break;
@@ -59,28 +72,17 @@ async function handleInteraction(interaction) {
       case "b-pack":
         await cardInteractions.BuyPack(interaction);
         break;
-      
-      // card relational commands
-      case "f-card":
-      await cardInteractions.findCard(interaction, activeInteractions);
-        break;
-      case "my-cards":
-      await cardInteractions.MyCards(interaction, activeInteractions);
-        break;
-      case "o-pack":
-      await cardInteractions.OpenPack(interaction);
-        break;
-      case 'collection':
-      await cardInteractions.Collection(interaction, activeInteractions);
+      case "stardom":
+        await cardInteractions.SetStardom(interaction, activeInteractions);
         break;
       // admin relational commands
       case "add-cash":
-      await adminInteractions.addCash(interaction);
+        await adminInteractions.addCash(interaction);
         break;
       case "remove-cash":
         await adminInteractions.removeCash(interaction);
         break;
-    } 
+    }
   } catch (error) {
     console.error("Erro ao processar a interação:", error);
 

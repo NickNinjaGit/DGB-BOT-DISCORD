@@ -336,4 +336,26 @@ module.exports = class EmbedController {
 
     return embed;
   }
+
+  static async StardomSettings(stardomTier, starPoins, cardName, currentIMG) {
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
+      .setTitle(`⚔️⠀Ajustes de ${cardName}⠀⚔️`)
+      .setDescription(`*Selecione uma moldura padrão de estrelato para a imagem da sua carta. Quanto mais batalhas ganhas, mais estrelato você terá com a carta. Para liberar outros estilos, ganhe mais pontos!*`)
+      .setImage(currentIMG)
+      .setColor("Gold")
+      .addFields({name: "Quantidade de Estrelato: ", value: `**${starPoins}** 🌟`, inline: true})
+      .addFields({ name: "⠀⠀", value: `-----------------------------` })
+      .addFields(
+        {name: "Tier: ", value: `**${stardomTier}**`, inline: true},
+      )
+      return embed;
+  }
+
+  static  getUpdatedEmbed(imageUrl, description) {
+    return new EmbedBuilder()
+      .setTitle(description)
+      .setImage(imageUrl)
+      .setColor('Gold'); // Personalize a cor se quiser
+  }
 };

@@ -42,7 +42,7 @@ async function myProfile(interaction, activeInteractions) {
     components: [profileButtons],
     fetchReply: true,
   });
-
+  activeInteractions.add(discordID);
   CollectorController.ProfileCollector(interaction, discordID, myProfileEmbed, profileButtons, activeInteractions);
 }
 
@@ -230,7 +230,7 @@ async function Shop(interaction, activeInteractions) {
     embeds: [shopEmbed],
     components: [shopButtons],
   });
-
+  activeInteractions.add(discordID);
   CollectorController.ShopCollector(
     interaction,
     discordID,

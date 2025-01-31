@@ -28,6 +28,10 @@ const UserCards = db.define("usercards", {
         type: DataTypes.INTEGER,
         defaultValue: 0,
     },
+    stardomTier: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
     currentIMG: {
         type: DataTypes.STRING,
         allowNull: false,
