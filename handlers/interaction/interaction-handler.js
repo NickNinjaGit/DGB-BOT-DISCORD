@@ -72,6 +72,9 @@ async function handleInteraction(interaction) {
       case "b-pack":
         await cardInteractions.BuyPack(interaction);
         break;
+      case 'b-inventory':
+        await cardInteractions.BuyInventory(interaction);
+        break;
       case "stardom":
         await cardInteractions.SetStardom(interaction, activeInteractions);
         break;
