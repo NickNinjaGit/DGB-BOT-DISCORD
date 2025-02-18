@@ -1,20 +1,23 @@
-
+                                                                                            /home/nicolas/teste.sh
 #!/bin/bash
 
 
-##script para checa se o repositorio teve alteração (git log --since="1 minute ago"), caso sim faz o pull, caso não encerra o script. 
-changes=$(git log --since="5 minutes ago")
+##script para checa se o repositorio teve alteração (git log --since="1 minute ago"), caso sim faz o pull, caso não encerra o script.
+
+cd /home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD || exit 1
+
+changes=$(git log --since="35 minutes ago")
 
 if [ -n "$changes" ]; then
     echo "Uma alteração foi feita"
 
-    git pull
-    PID=$(pgrep -f "npm start")
+git pull
+PID=$(pgrep -f "npm start")
     if [ -n "$PID" ]; then
         kill -9 $PID
         echo "processo npm encerrado"
     fi
-    nohup npm start &
+nohup /home/nicolas/.nvm/versions/node/v22.12.0/bin/npm start &
 else
     echo "Nenhuma alteração foi feita"
     exit 0
@@ -23,6 +26,7 @@ fi
 # Caminho para o repositório
 
 
-#Mata o processo do npm capturando o processo e matando PID=$(pgrep -f "npm start") && kill-9 $PI D 
-#depois executa o nohup npm start & 
+#Mata o processo do npm capturando o processo e matando PID=$(pgrep -f "npm start") && kill-9 $PI D
+#depois executa o nohup npm start &
+
 
