@@ -285,11 +285,9 @@ async function StartBattle(interaction, activeInteractions) {
   })
 
   collector.on("collect", async (i) => {
-    if(i.c)
+    
   })
-
-  
-  
 }
+  
 
 module.exports = { myProfile, friendProfile, Work, Daily, Shop, Leaderboards };
