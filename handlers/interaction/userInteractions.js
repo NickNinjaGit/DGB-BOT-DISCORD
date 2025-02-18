@@ -269,24 +269,34 @@ async function StartBattle(interaction, activeInteractions) {
     return;
   }
 
-  interaction.reply({
-    content: `${interaction.user.username} está desafiando ${challengedUser.username} para uma batalha!`,
+  const challenge = await interaction.reply({
+    content: `@${interaction.user.username} está desafiando @${challengedUser.username} para uma batalha!`,
+    withResponse: true
   })
+
+  const emoji = 
+
+  challenge.resource.message.react('😄');
+
 
   activeInteractions.add(discordID);
 
   // create a reaction collector
-  const collectorFilter = (reaction, user) => {
+  /*const collectorFilter = (reaction, user) => {
     return reaction.emoji.name === '👍' && user.id === message.author.id;
   };
   const collector = interaction.channel.createMessageComponentCollector({
-    filter : (i) => i.user.id === challengedUser.id,
+    filter : (i) => i.user.id === collectorFilter,
     time:  30000, //5 minutos
   })
 
-  collector.on("collect", async (i) => {
-    
-  })
+  collector.on("collect", (reaction) => {
+    if (reaction.emoji.name === '👍') {
+      interaction.reply({
+        content: `${interaction.user.username} aceitou a batalha!`,
+      })
+    }
+  })*/
 } 
 
-module.exports = { myProfile, friendProfile, Work, Daily, Shop, Leaderboards };
+module.exports = { myProfile, friendProfile, Work, Daily, Shop, Leaderboards, StartBattle };
