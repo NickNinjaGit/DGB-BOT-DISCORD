@@ -352,7 +352,27 @@ module.exports = class EmbedController {
       return embed;
   }
 
-  static  getUpdatedEmbed(imageUrl, description) {
+  static async ShowLeaderboard(users)
+  {
+    users = users.slice(0, 10);
+    let i = 1;
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
+      .setTitle(`🏆⠀Leaderboards ⠀🏆`)
+      .setColor("Gold")
+      .addFields({name: "========================", value: `⠀`})
+      users.forEach((user) => {
+        embed.addFields({
+          name: `🏆⠀${i} | @${user.name} | ${user.BattlesWon} vitórias`,
+          value: `⠀`,
+        })
+        i++;
+      })
+    
+      return embed;
+  }
+  
+  static getUpdatedEmbed(imageUrl, description) {
     return new EmbedBuilder()
       .setTitle(description)
       .setImage(imageUrl)

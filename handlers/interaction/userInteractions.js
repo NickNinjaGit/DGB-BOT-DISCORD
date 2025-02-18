@@ -17,7 +17,7 @@ const wait = require("util").promisify(setTimeout);
 // gif exibition
 const path = require("path");
 img_folder = path.resolve(__dirname, "../../images/");
-const { AttachmentBuilder } = require("discord.js");
+const { AttachmentBuilder, InteractionWebhook } = require("discord.js");
 
 
 /* User Relational interactions */
@@ -246,5 +246,50 @@ async function Shop(interaction, activeInteractions) {
     activeInteractions
   );
 }
+async function Leaderboards(interaction) {
+  //get all users
+const users = await User.findAll({ order: [["BattlesWon", 'DESC']], raw: true });
+  // setting up embed
+  const leaderboardEmbed = await EmbedController.ShowLeaderboard(users);
+  
+  await interaction.reply({
+    embeds: [leaderboardEmbed],
+    ephemeral: true,
+  })
+}
+async function StartBattle(interaction, activeInteractions) {
+  const discordID = interaction.user.id;
+  const challengedUser = interaction.options.getUser("user");
 
-module.exports = { myProfile, friendProfile, Work, Daily, Shop };
+  // check if user active interactions
+  const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
+
+  if(isActiveInteractions === true)
+  {
+    return;
+  }
+
+  interaction.reply({
+    content: `${interaction.user.username} está desafiando ${challengedUser.username} para uma batalha!`,
+  })
+
+  activeInteractions.add(discordID);
+
+  // create a reaction collector
+  const collectorFilter = (reaction, user) => {
+    return reaction.emoji.name === '👍' && user.id === message.author.id;
+  };
+  const collector = interaction.channel.createMessageComponentCollector({
+    filter : (i) => i.user.id === challengedUser.id,
+    time:  30000, //5 minutos
+  })
+
+  collector.on("collect", async (i) => {
+    if(i.c)
+  })
+
+  
+  
+}
+
+module.exports = { myProfile, friendProfile, Work, Daily, Shop, Leaderboards };

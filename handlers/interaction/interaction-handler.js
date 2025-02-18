@@ -40,6 +40,9 @@ async function handleInteraction(interaction) {
       case "friend-profile":
         await userInteractions.friendProfile(interaction);
         break;
+      case "leaderboards":
+        await userInteractions.Leaderboards(interaction);
+        break;
       case "work":
         await userInteractions.Work(interaction);
         break;
@@ -48,6 +51,9 @@ async function handleInteraction(interaction) {
         break;
       case "shop":
         await userInteractions.Shop(interaction, activeInteractions);
+        break;
+      case "battle":
+        await userInteractions.StartBattle(interaction, activeInteractions);
         break;
 
       // card relational commands

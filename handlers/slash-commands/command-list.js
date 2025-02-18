@@ -130,10 +130,16 @@ module.exports = [
     ),
 
   // Leaderboards Command
+  new SlashCommandBuilder()
+    .setName('leaderboards')
+    .setDescription('Exibe o ranking global do DGB.'),
   // Battle Command
-
+  new SlashCommandBuilder()
+    .setName("battle")
+    .setDescription("Desafie um amigo para uma batalha.")
+    .addUserOption((option) => option.setName("user").setDescription("Selecione um amigo para desafiar").setRequired(true))
+    .addIntegerOption((option) => option.setName("turnos").setDescription("Quantidade de turnos para a batalha acabar").setRequired(true)),
   /* Admin commands */
-  // Add Card Command
   // Add Cash Command
   new SlashCommandBuilder()
     .setName("add-cash")
@@ -166,8 +172,4 @@ module.exports = [
         .setDescription("Selecione um usuário para adicionar moedas")
         .setRequired(true)
     ),
-
-  // Remove Card Command
-  // Update Card Command
-  // Test Command
 ];
