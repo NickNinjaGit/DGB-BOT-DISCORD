@@ -129,7 +129,7 @@ module.exports = [
         .setRequired(true)
     ),
 
-  // Leaderboards Command Alteração feita por aqui
+  // Leaderboards Command Alteração feita por aqui denovo 
   new SlashCommandBuilder()
     .setName('leaderboards')
     .setDescription('Exibe o ranking global do DGB.'),
