@@ -2,7 +2,7 @@
 #!/bin/bash
 
 
-##script para checa se o repositorio teve alteração (git log --since="1 minute ago"), caso sim faz o pull, caso não encerra o script.
+##ALTERANDO COMENTÁRIO NO DEPLOY.SH
 
 cd /home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD || exit 1
 
