@@ -1,8 +1,8 @@
-                                                                                            /home/nicolas/teste.sh
+                                                                                
 #!/bin/bash
 
 
-##ALTERANDO COMENTÁRIO NO DEPLOY.SH TESTANDO TESTE.SH
+##ALTERANDO COMENTÁRIO NO DEPLOY.SH TESTANDO TESTE.SH MAIS UM TESTE.SH
 
 cd /home/nicolas/DISCORD_GACHA_BATTLE_BOT/DGB-BOT-DISCORD || exit 1
 
