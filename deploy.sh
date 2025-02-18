@@ -3,7 +3,7 @@
 
 
 ##script para checa se o repositorio teve alteração (git log --since="1 minute ago"), caso sim faz o pull, caso não encerra o script. 
-changes=$(git log --since="1 minute ago")
+changes=$(git log --since="5 minutes ago")
 
 if [ -n "$changes" ]; then
     echo "Uma alteração foi feita"
