@@ -329,6 +329,36 @@ async function BuyPack(interaction) {
   interaction.deleteReply();
 }
 
+async function BuyInventory(interaction) {
+  const discordID = interaction.user.id;
+  const user = await User.findOne({ where: { discordID } });
+  const qty = interaction.options.getInteger("quantity");
+  const buyGif = new AttachmentBuilder(`${img_folder}/buy.gif`);
+
+  // check if user has enough money
+  if (user.wallet < qty * 10) {
+    await interaction.reply({
+      content: "Dinheiro insuficiente!",
+    });
+    await wait(3000);
+    await interaction.deleteReply();
+    return;
+  }
+
+  // buy inventory
+  user.wallet -= qty * 100;
+  user.inventoryLimit += qty;
+  await user.save();
+
+  // send message
+  interaction.reply({
+    content: `Mais espaço de inventário comprado com sucesso! **Use o comando /my-profile para ver seu inventário!**`,
+    files: [buyGif],
+  });
+  await wait(3000);
+  interaction.deleteReply();
+}
+
 async function SetStardom(interaction, activeInteractions) {
     const discordID = interaction.user.id;
     const user = await User.findOne({ where: { discordID } });
@@ -377,4 +407,4 @@ async function SetStardom(interaction, activeInteractions) {
     // collector
     await CollectorController.StardomCollector(interaction, discordID, card, userCard, stardomButtons, quitButton, activeInteractions);
 }
-module.exports = { findCard, MyCards, OpenPack, Collection, BuyCard, SellCard, BuyPack, SetStardom };
+module.exports = { findCard, MyCards, OpenPack, Collection, BuyCard, SellCard, BuyPack, BuyInventory, SetStardom };
