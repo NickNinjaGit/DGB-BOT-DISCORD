@@ -271,12 +271,11 @@ async function StartBattle(interaction, activeInteractions) {
 
   const challenge = await interaction.reply({
     content: `@${interaction.user.username} está desafiando @${challengedUser.username} para uma batalha!`,
-    withResponse: true
+    fetchReply: true
   })
 
-  const emoji = 
-
-  challenge.resource.message.react('😄');
+  await challenge.react("👍");
+  await challenge.react("👎");
 
 
   activeInteractions.add(discordID);
