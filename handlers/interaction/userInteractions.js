@@ -41,13 +41,14 @@ async function myProfile(interaction, activeInteractions) {
   );
   const profileButtons = await ButtonController.ProfileButtons();
   await interaction.deferReply();
+  await wait(4000);
   await interaction.editReply({
     embeds: [myProfileEmbed],
     components: [profileButtons],
     fetchReply: true,
   });
   activeInteractions.add(discordID);
-  CollectorController.ProfileCollector(
+  await CollectorController.ProfileCollector(
     interaction,
     discordID,
     myProfileEmbed,
