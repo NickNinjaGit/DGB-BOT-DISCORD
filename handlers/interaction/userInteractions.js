@@ -1,4 +1,5 @@
 // Controllers
+const BattleController = require("../../controllers/BattleController");
 const EmbedController = require("../../controllers/EmbedController");
 const CollectorController = require("../../controllers/CollectorController");
 const CardController = require("../../controllers/CardController");
@@ -17,18 +18,20 @@ const wait = require("util").promisify(setTimeout);
 // gif exibition
 const path = require("path");
 img_folder = path.resolve(__dirname, "../../images/");
-const { AttachmentBuilder, InteractionWebhook } = require("discord.js");
-
+const { AttachmentBuilder } = require("discord.js");
 
 /* User Relational interactions */
 async function myProfile(interaction, activeInteractions) {
   const discordID = interaction.user.id;
   const userImage = interaction.user.displayAvatarURL();
 
-  const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
+  const isActiveInteractions = await checkActiveInteractions(
+    discordID,
+    interaction,
+    activeInteractions
+  );
 
-  if (isActiveInteractions === true)
-  {
+  if (isActiveInteractions === true) {
     return;
   }
 
@@ -43,7 +46,13 @@ async function myProfile(interaction, activeInteractions) {
     fetchReply: true,
   });
   activeInteractions.add(discordID);
-  CollectorController.ProfileCollector(interaction, discordID, myProfileEmbed, profileButtons, activeInteractions);
+  CollectorController.ProfileCollector(
+    interaction,
+    discordID,
+    myProfileEmbed,
+    profileButtons,
+    activeInteractions
+  );
 }
 
 async function friendProfile(interaction) {
@@ -98,10 +107,13 @@ async function Work(interaction) {
   const cooldownTime = 3 * 60 * 60 * 1000; // 3 horas em milissegundos
 
   // Verifica se o usuário está em cooldown
-  const isInCooldown = await checkCooldownTimer(discordID, interaction, Work_cooldown);
+  const isInCooldown = await checkCooldownTimer(
+    discordID,
+    interaction,
+    Work_cooldown
+  );
 
-  if (isInCooldown)
-  {
+  if (isInCooldown) {
     return;
   }
   // Calcula a quantidade de dinheiro ganho
@@ -187,10 +199,13 @@ async function Shop(interaction, activeInteractions) {
   const discordID = interaction.user.id;
   const user = await User.findOne({ where: { discordID } });
 
-  const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
+  const isActiveInteractions = await checkActiveInteractions(
+    discordID,
+    interaction,
+    activeInteractions
+  );
 
-  if (isActiveInteractions === true)
-  {
+  if (isActiveInteractions === true) {
     return;
   }
 
@@ -206,17 +221,9 @@ async function Shop(interaction, activeInteractions) {
   // Faz um calculo de total de páginas considerando as páginas quebradiças
   const totalPages = Math.ceil(cardList.length / ItensPerPage);
 
-  let cardsPerPage = await Pagination(
-    pageId,
-    ItensPerPage,
-    cardList
-  );
+  let cardsPerPage = await Pagination(pageId, ItensPerPage, cardList);
 
-  let packagesPerPage = await Pagination(
-    pageId,
-    ItensPerPage,
-    packageList
-  );
+  let packagesPerPage = await Pagination(pageId, ItensPerPage, packageList);
 
   // setting embed & buttons
   let shopEmbed = await EmbedController.ShowShop(
@@ -248,54 +255,159 @@ async function Shop(interaction, activeInteractions) {
 }
 async function Leaderboards(interaction) {
   //get all users
-const users = await User.findAll({ order: [["BattlesWon", 'DESC']], raw: true });
+  const users = await User.findAll({
+    order: [["BattlesWon", "DESC"]],
+    raw: true,
+  });
   // setting up embed
   const leaderboardEmbed = await EmbedController.ShowLeaderboard(users);
-  
+
   await interaction.reply({
     embeds: [leaderboardEmbed],
     ephemeral: true,
-  })
+  });
 }
 async function StartBattle(interaction, activeInteractions) {
   const discordID = interaction.user.id;
   const challengedUser = interaction.options.getUser("user");
+  const turnosQty = interaction.options.getInteger("turnos");
+
+  if(challengedUser.id === discordID) {
+    await interaction.reply({
+      content: "**Você não pode se desafiar a si mesmo!**",
+    });
+    await wait(2000);
+    await interaction.deleteReply();
+    return;
+  }
+  if(challengedUser.bot) {
+    await interaction.reply({
+      content: "**Bots não podem ser desafiados!**",
+    });
+    await wait(2000);
+    await interaction.deleteReply();
+    return;
+  }
 
   // check if user active interactions
-  const isActiveInteractions = await checkActiveInteractions(discordID, interaction, activeInteractions);
+  const isActiveInteractions = await checkActiveInteractions(
+    discordID,
+    interaction,
+    activeInteractions
+  );
 
-  if(isActiveInteractions === true)
-  {
+  if (isActiveInteractions === true) {
+    return;
+  }
+  // check if the user is in a battle
+  const userOnBattle = await User.findOne({ where: { discordID } });
+  if (userOnBattle.IsInBattle === true) {
+    await interaction.reply({
+      content: "**Impossível desafiar agora, Você ja está em uma batalha!**",
+    });
+    await wait(2000);
+    await interaction.deleteReply();
+    return;
+  }
+  // check if challenged user is already in a battle
+  const challengedUserOnBattle = await User.findOne({
+    where: { discordID: challengedUser.id },
+  });
+
+  if (challengedUserOnBattle.IsInBattle === true) {
+    await interaction.reply({
+      content: "**O usuário selecionado já esta em uma batalha!**",
+    });
+    await wait(2000);
+    await interaction.deleteReply();
     return;
   }
 
   const challenge = await interaction.reply({
-    content: `@${interaction.user.username} está desafiando @${challengedUser.username} para uma batalha!`,
-    fetchReply: true
-  })
+    content: `<@${interaction.user.id}> está desafiando <@${challengedUser.id}> para uma batalha de ${turnosQty} turnos...`,
+    fetchReply: true,
+  });
 
   await challenge.react("👍");
   await challenge.react("👎");
-
+  await challenge.react("❌");
 
   activeInteractions.add(discordID);
 
-  // create a reaction collector
-  /*const collectorFilter = (reaction, user) => {
-    return reaction.emoji.name === '👍' && user.id === message.author.id;
+  const BattleRequest = (reaction, user) => {
+    return (
+      reaction.emoji.name === "👍" ||
+      (reaction.emoji.name === "👎" && user.id === challengedUser.id)
+    );
   };
-  const collector = interaction.channel.createMessageComponentCollector({
-    filter : (i) => i.user.id === collectorFilter,
-    time:  30000, //5 minutos
-  })
+  const BattleCancel = (reaction, user) => {
+    return reaction.emoji.name === "❌" && user.id === discordID;
+  };
+  const collector = challenge.createReactionCollector({
+    filters: [BattleRequest, BattleCancel],
+    time: 300000, //5 minutos
+  });
 
-  collector.on("collect", (reaction) => {
-    if (reaction.emoji.name === '👍') {
-      interaction.reply({
-        content: `${interaction.user.username} aceitou a batalha!`,
-      })
+  collector.on("collect", async (reaction) => {
+    if (reaction.emoji.name === "👍") {
+      await interaction.editReply({
+        content: `<@${challengedUser.id}> aceitou o desafio!`,
+      });
+
+      // defina que os usuários estão em batalha
+      const user1 = await User.findOne({ where: { discordID: discordID } });
+      const user2 = await User.findOne({
+        where: { discordID: challengedUser.id },
+      });
+      user1.IsInBattle = true;
+      user2.IsInBattle = true;
+      await user1.save();
+      await user2.save();
+
+      const message = await interaction.fetchReply();
+
+      // Criar a thread a partir da mensagem de resposta
+      const thread = await message.startThread({
+          name: `${interaction.user.username} vs ${challengedUser.username}`,
+          autoArchiveDuration: 1440, // 24 horas (1440 minutos)
+          reason: "Tópico para separar as batalhas",
+      });
+
+      console.log(`${thread.name} criado com sucesso!`);
+
+      // inicie o setup da batalha
+      //await BattleController.BattleSetup(user1, user2, thread, turnosQty);
+
+      activeInteractions.delete(discordID);
+      await wait(30000);
+      return;
+    } else if (reaction.emoji.name === "👎") {
+      await interaction.editReply({
+        content: `<@${challengedUser.id}> recusou o desafio!`,
+      });
+      activeInteractions.delete(discordID);
+      collector.stop();
+      return;
+    } else if (reaction.emoji.name === "❌") {
+      await interaction.editReply({
+        content: `<@${interaction.user.id}> cancelou o desafio!`,
+      });
+      activeInteractions.delete(discordID);
+      collector.stop();
     }
-  })*/
-} 
+  });
+  collector.on("end", async () => {
+    await wait(2000);
+    await interaction.deleteReply();
+  });
+}
 
-module.exports = { myProfile, friendProfile, Work, Daily, Shop, Leaderboards, StartBattle };
+module.exports = {
+  myProfile,
+  friendProfile,
+  Work,
+  Daily,
+  Shop,
+  Leaderboards,
+  StartBattle,
+};
