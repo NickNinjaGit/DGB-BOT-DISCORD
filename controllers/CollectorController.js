@@ -4,6 +4,8 @@ const CardController = require("./CardController");
 // helper
 const Pagination = require("../helpers/pagination");
 
+const wait = require("node:timers/promises").setTimeout;
+
 module.exports = class CollectorController {
   static async CardCollector(
     interaction,
@@ -40,16 +42,18 @@ module.exports = class CollectorController {
           fetchReply: true,
         });
       } else if (i.customId === "quit") {
-        await activeInteractions.delete(discordID);
-        await i.update({
-          content: "Saída realizada com sucesso.",
-          embeds: [],
-          components: [],
-          fetchReply: true,
-        });
         collector.stop();
-        await i.deleteReply();
       }
+    });
+    collector.on("end", async () => {
+      activeInteractions.delete(discordID);
+      await interaction.editReply({
+        content: "✅Saida realizada com sucesso.✅",
+        components: [],
+      })
+      await wait(500);
+      await interaction.deleteReply();
+      
     });
   }
   static async MyCardsCollector(
@@ -100,15 +104,18 @@ module.exports = class CollectorController {
           fetchReply: true,
         });
       } else if (i.customId === "quit") {
-        activeInteractions.delete(discordID);
         collector.stop();
-        await i.update({
-          content: "Interação finalizada.",
-          components: [],
-          fetchReply: true,
-        });
-        await i.deleteReply();
       }
+    });
+    collector.on("end", async () => {
+      activeInteractions.delete(discordID);
+      await interaction.editReply({
+        content: "✅Saida realizada com sucesso.✅",
+        components: [],
+      })
+      await wait(500);
+      await interaction.deleteReply();
+      
     });
     // Configurar o coletor para ouvir interações nos botões
   }
@@ -164,15 +171,18 @@ module.exports = class CollectorController {
       }
 
       if (i.customId === "quit") {
-        activeInteractions.delete(discordID);
         collector.stop();
-        await i.update({
-          content: "Interação finalizada.",
-          components: [],
-          fetchReply: true,
-        });
-        await i.deleteReply();
       }
+    });
+    collector.on("end", async () => {
+      activeInteractions.delete(discordID);
+      await interaction.editReply({
+        content: "✅Saida realizada com sucesso.✅",
+        components: [],
+      })
+      await wait(500);
+      await interaction.deleteReply();
+      
     });
   }
 
@@ -203,17 +213,20 @@ module.exports = class CollectorController {
           components: [profileButtons],
           fetchReply: true,
         });
-      } else if (i.customId === "quit") {
+        } else if (i.customId === "quit") {
+          collector.stop();
+        }
+      });
+      collector.on("end", async () => {
         activeInteractions.delete(discordID);
-        collector.stop();
-        await i.update({
-          content: "Interação finalizada.",
+        await interaction.editReply({
+          content: "✅Saida realizada com sucesso.✅",
           components: [],
-          fetchReply: true,
-        });
-        await i.deleteReply();
-      }
-    });
+        })
+        await wait(500);
+        await interaction.deleteReply();
+        
+      });
   }
   static async ShopCollector(
     interaction,
@@ -271,16 +284,19 @@ module.exports = class CollectorController {
         });
       }
       if (i.customId === "quit") {
-        activeInteractions.delete(discordID);
-        await i.update({
-          content: "Saida realizada com sucesso.",
-          embeds: [],
-          components: [],
-          ephemeral: true,
-        });
         collector.stop();
-        await i.deleteReply();
       }
+      
+    });
+    collector.on("end", async () => {
+      activeInteractions.delete(discordID);
+      await interaction.editReply({
+        content: "Saida realizada com sucesso.",
+        components: [],
+      })
+      await wait(500);
+      await interaction.deleteReply();
+      
     });
   }
   static async StardomCollector(
@@ -365,15 +381,19 @@ module.exports = class CollectorController {
 
 
       if (i.customId === "quit") {
-        activeInteractions.delete(discordID);
         collector.stop();
-        await i.update({
-          content: "Interação finalizada.",
-          components: [],
-        });
-        await i.deleteReply();
         return;
       }
+    });
+    collector.on("end", async () => {
+      activeInteractions.delete(discordID);
+      await interaction.editReply({
+        content: "✅Saida realizada com sucesso.✅",
+        components: [],
+      })
+      await wait(500);
+      await interaction.deleteReply();
+      
     });
   }
 };
