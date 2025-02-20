@@ -75,6 +75,15 @@ async function friendProfile(interaction) {
     selectedUser.username,
     true // true para impedir que o usuário tenha uma conta criada contra sua vontade
   );
+  if(selectedUser.id = interaction.user.id)
+  {
+    await interaction.reply({
+      content: "Você não pode ver seu próprio perfil com este commando, use /my-profile para isso!",
+    });
+    await wait(2000);
+    await interaction.deleteReply();
+    return;
+  }
 
   if (friendRegistered === false) {
     // Se o amigo não tiver conta
@@ -92,9 +101,8 @@ async function friendProfile(interaction) {
     );
     await interaction.reply({
       embeds: [friendProfileEmbed],
+      ephemeral: true,
     });
-    await wait(3000);
-    await interaction.deleteReply();
   }
 }
 
