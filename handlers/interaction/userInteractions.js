@@ -40,9 +40,7 @@ async function myProfile(interaction, activeInteractions) {
     userImage
   );
   const profileButtons = await ButtonController.ProfileButtons();
-  await interaction.deferReply();
-  await wait(4000);
-  await interaction.editReply({
+  await interaction.reply({
     embeds: [myProfileEmbed],
     components: [profileButtons],
     fetchReply: true,

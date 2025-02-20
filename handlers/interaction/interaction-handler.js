@@ -21,8 +21,7 @@ async function handleInteraction(interaction) {
     );
     if (!userRegistered) {
       // Defer reply para evitar timeout
-      await interaction.deferReply({ ephemeral: true });
-      await interaction.editReply({
+      await interaction.reply({
         content:
           "Boas-vindas ao Gacha Battle Bot! Sua conta foi criada com sucesso!",
       });
