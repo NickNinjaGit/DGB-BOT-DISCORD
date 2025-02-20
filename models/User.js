@@ -3,13 +3,13 @@ const { DataTypes } = require("sequelize");
 
 const User = db.define("user", {
   discordID: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(20),
     required: true,
     allowNull: false,
     unique: true,
   },
   name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(32),
     required: true,
     allowNull: false,
   },

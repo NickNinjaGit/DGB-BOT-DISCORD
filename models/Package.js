@@ -5,7 +5,7 @@ const { TimestampStyles } = require("discord.js");
 
 const Package = db.define("package", {
     name: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
         required: true,
         allowNull: false,
     },

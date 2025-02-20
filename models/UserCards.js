@@ -33,7 +33,7 @@ const UserCards = db.define("usercards", {
         allowNull: false,
     },
     currentIMG: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(512),
         allowNull: false,
     },
     currentHP: {

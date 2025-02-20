@@ -4,28 +4,28 @@ const Skill = require("./Skill");
 
 const Card = db.define("card", {
   name: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(100),
     required: true,
     allowNull: false,
     unique: "card_name_index",
   },
   description: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT("medium"),
     required: true,
     allowNull: false,
   },
   universe: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(100),
     required: true,
     allowNull: false,
   },
   image: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(512),
     required: true,
     allowNull: false,
   },
   imageHash: {
-    type: DataTypes.STRING,
+    type: DataTypes.STRING(64),
     required: true,
     allowNull: false,
     unique: "card_image_index",

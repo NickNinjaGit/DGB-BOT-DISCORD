@@ -39,7 +39,7 @@ client.once(Events.ClientReady, async (c) => {
 
   try {
     await conn.authenticate();
-    await conn.sync({ force: false });
+    await conn.sync({ force: true });
     await loadCards();
 
     logger.info("Conexão com o banco de dados estabelecida com sucesso!");
