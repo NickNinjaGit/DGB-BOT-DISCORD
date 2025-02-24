@@ -18,7 +18,8 @@ const wait = require("util").promisify(setTimeout);
 // gif exibition
 const path = require("path");
 img_folder = path.resolve(__dirname, "../../images/");
-const { AttachmentBuilder } = require("discord.js");
+const { AttachmentBuilder, ChannelType } = require("discord.js");
+const UserCards = require("../../models/UserCards");
 
 /* User Relational interactions */
 async function myProfile(interaction, activeInteractions) {
@@ -279,15 +280,33 @@ async function StartBattle(interaction, activeInteractions) {
   const discordID = interaction.user.id;
   const challengedUser = interaction.options.getUser("user");
   const turnosQty = interaction.options.getInteger("turnos");
+  const user = await User.findOne({ where: { discordID } });
+  const userHasCards = await UserCards.findAll({ where: { userId: user.id } });
 
-  if(challengedUser.id === discordID) {
+  // check if user is inside a topic
+  if (interaction.channel.type === ChannelType.PublicThread || interaction.channel.type === ChannelType.PrivateThread) {
+    interaction.reply({ content: '⚠️ Esse comando não pode ser usado dentro de um tópico.', ephemeral: true });
+    await wait(2000);
+    await interaction.deleteReply();
+    return;
+}
+
+  if (userHasCards.length === 0) {
+    await interaction.reply({
+      content: "**Um dos usuários selecionados não possui cartas!**",
+    })
+    await wait(2000);
+    await interaction.deleteReply();
+    return;
+  }
+  /*if(challengedUser.id === discordID) {
     await interaction.reply({
       content: "**Você não pode se desafiar a si mesmo!**",
     });
     await wait(2000);
     await interaction.deleteReply();
     return;
-  }
+  }*/
   if(challengedUser.bot) {
     await interaction.reply({
       content: "**Bots não podem ser desafiados!**",
@@ -322,6 +341,15 @@ async function StartBattle(interaction, activeInteractions) {
     where: { discordID: challengedUser.id },
   });
 
+  if (!challengedUserOnBattle) {
+    await interaction.reply({
+      content: "**O usuário selecionado nao está registrado!**",
+    })
+    await wait(2000);
+    await interaction.deleteReply();
+    return;
+  }
+
   if (challengedUserOnBattle.IsInBattle === true) {
     await interaction.reply({
       content: "**O usuário selecionado já esta em uma batalha!**",
@@ -341,73 +369,8 @@ async function StartBattle(interaction, activeInteractions) {
   await challenge.react("❌");
 
   activeInteractions.add(discordID);
+  await CollectorController.StartBattleCollector(interaction, challenge, challengedUser, turnosQty, discordID, activeInteractions);
 
-  const BattleRequest = (reaction, user) => {
-    return (
-      reaction.emoji.name === "👍" ||
-      (reaction.emoji.name === "👎" && user.id === challengedUser.id)
-    );
-  };
-  const BattleCancel = (reaction, user) => {
-    return reaction.emoji.name === "❌" && user.id === discordID;
-  };
-  const collector = challenge.createReactionCollector({
-    filters: [BattleRequest, BattleCancel],
-    time: 300000, //5 minutos
-  });
-
-  collector.on("collect", async (reaction) => {
-    if (reaction.emoji.name === "👍") {
-      await interaction.editReply({
-        content: `<@${challengedUser.id}> aceitou o desafio!`,
-      });
-
-      // defina que os usuários estão em batalha
-      const user1 = await User.findOne({ where: { discordID: discordID } });
-      const user2 = await User.findOne({
-        where: { discordID: challengedUser.id },
-      });
-      user1.IsInBattle = true;
-      user2.IsInBattle = true;
-      await user1.save();
-      await user2.save();
-
-      const message = await interaction.fetchReply();
-
-      // Criar a thread a partir da mensagem de resposta
-      const thread = await message.startThread({
-          name: `${interaction.user.username} vs ${challengedUser.username}`,
-          autoArchiveDuration: 1440, // 24 horas (1440 minutos)
-          reason: "Tópico para separar as batalhas",
-      });
-
-      console.log(`${thread.name} criado com sucesso!`);
-
-      // inicie o setup da batalha
-      //await BattleController.BattleSetup(user1, user2, thread, turnosQty);
-
-      activeInteractions.delete(discordID);
-      await wait(30000);
-      return;
-    } else if (reaction.emoji.name === "👎") {
-      await interaction.editReply({
-        content: `<@${challengedUser.id}> recusou o desafio!`,
-      });
-      activeInteractions.delete(discordID);
-      collector.stop();
-      return;
-    } else if (reaction.emoji.name === "❌") {
-      await interaction.editReply({
-        content: `<@${interaction.user.id}> cancelou o desafio!`,
-      });
-      activeInteractions.delete(discordID);
-      collector.stop();
-    }
-  });
-  collector.on("end", async () => {
-    await wait(2000);
-    await interaction.deleteReply();
-  });
 }
 
 module.exports = {

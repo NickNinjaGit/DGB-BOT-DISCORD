@@ -6,7 +6,10 @@ const conn = new Sequelize({
     username: 'root',
     password: process.env.DB_PASSWORD,
     database: 'dgbbot_database',
-    logging: false
+    logging: false,
+    define: {
+        timestamps: false
+    }
 });
 
 module.exports = conn;

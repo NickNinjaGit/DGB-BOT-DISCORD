@@ -30,7 +30,7 @@ module.exports = class ButtonController {
 
     return { skillRow, backRow };
   }
-  static async StardomButtons(starPoints, stardomTier) {
+  static async StardomButtons(starPoints) {
     const buttonConfigs = [
         { min: 10, id: "stardom-bronze", label: "Mudar para Bronze", style: ButtonStyle.Success },
         { min: 50, id: "stardom-silver", label: "Mudar para Prata", style: ButtonStyle.Success },
@@ -97,5 +97,22 @@ module.exports = class ButtonController {
         .setStyle(ButtonStyle.Danger)
     );
     return navRow;
+  }
+  static async BattleButtons() {
+    const battleRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("attack")
+        .setLabel(`Atacar`)
+        .setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("defend")
+        .setLabel(`Defender`)
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("skillList")
+        .setLabel(`Skills`)
+        .setStyle(ButtonStyle.Success),
+    )
+    return battleRow;
   }
 };

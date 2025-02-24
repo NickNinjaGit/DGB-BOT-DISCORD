@@ -214,6 +214,44 @@ module.exports = class EmbedController {
     });
     return embed;
   }
+  static async ShowBattleCard(card)
+  {
+    const embed = new EmbedBuilder()
+      .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
+      .setTitle(`🃏⠀${card.name}⠀⚔️`)
+      .setImage(card.currentIMG)
+      .setColor(card.rarity.color)
+      .addFields({
+        name: `Raridade: ${card.rarity.name}`,
+        value: `⠀`,
+      })
+      .addFields({ name: "Descrição", value: `*${card.description}*` })
+      .addFields({ name: "⠀⠀", value: `-----------------------------` })
+ 
+
+      .addFields(
+        { name: `${card.currentHP}/${card.HP}⠀❤️`, value: `⠀`, inline: true },
+        { name: `${card.currentMANA}/${card.MANA}⠀🌀`, value: `⠀`, inline: true }
+      )
+
+      .addFields(
+        {
+          name: `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀${card.skill1.name}`,
+          value: `**${card.currentATK}**⠀🗡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${
+            card.skill1?.cost || 0
+          }**⠀💠`,
+        },
+        {
+          name: `⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀${card.skill2.name}:`,
+          value: `**${card.currentDEF}**⠀🛡️⠀⠀⠀⠀⠀⠀⠀⠀Custo:⠀**${
+            card.skill2?.cost || 0
+          }**⠀💠`,
+        },
+        { name: `⠀`, value: `**${card.currentSPEED}**⠀💨` }
+      );
+
+    return embed;
+  }
   static async ShowPackCards(gainedCards) {
     const embedList = [];
     gainedCards.forEach((card) => {

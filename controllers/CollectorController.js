@@ -1,5 +1,8 @@
 const EmbedController = require("./EmbedController");
 const CardController = require("./CardController");
+const BattleController = require("./BattleController");
+
+const User = require("../models/User");
 
 // helper
 const Pagination = require("../helpers/pagination");
@@ -50,10 +53,9 @@ module.exports = class CollectorController {
       await interaction.editReply({
         content: "✅Saida realizada com sucesso.✅",
         components: [],
-      })
+      });
       await wait(500);
       await interaction.deleteReply();
-      
     });
   }
   static async MyCardsCollector(
@@ -112,14 +114,13 @@ module.exports = class CollectorController {
       await interaction.editReply({
         content: "✅Saida realizada com sucesso.✅",
         components: [],
-      })
+      });
       await wait(500);
       await interaction.deleteReply();
-      
     });
     // Configurar o coletor para ouvir interações nos botões
   }
-  static async CollectionController(
+  static async CollectionCollector(
     interaction,
     discordID,
     currentCardIndex,
@@ -179,10 +180,9 @@ module.exports = class CollectorController {
       await interaction.editReply({
         content: "✅Saida realizada com sucesso.✅",
         components: [],
-      })
+      });
       await wait(500);
       await interaction.deleteReply();
-      
     });
   }
 
@@ -213,20 +213,19 @@ module.exports = class CollectorController {
           components: [profileButtons],
           fetchReply: true,
         });
-        } else if (i.customId === "quit") {
-          collector.stop();
-        }
+      } else if (i.customId === "quit") {
+        collector.stop();
+      }
+    });
+    collector.on("end", async () => {
+      activeInteractions.delete(discordID);
+      await interaction.editReply({
+        content: "✅Saida realizada com sucesso.✅",
+        components: [],
       });
-      collector.on("end", async () => {
-        activeInteractions.delete(discordID);
-        await interaction.editReply({
-          content: "✅Saida realizada com sucesso.✅",
-          components: [],
-        })
-        await wait(500);
-        await interaction.deleteReply();
-        
-      });
+      await wait(500);
+      await interaction.deleteReply();
+    });
   }
   static async ShopCollector(
     interaction,
@@ -286,17 +285,15 @@ module.exports = class CollectorController {
       if (i.customId === "quit") {
         collector.stop();
       }
-      
     });
     collector.on("end", async () => {
       activeInteractions.delete(discordID);
       await interaction.editReply({
         content: "Saida realizada com sucesso.",
         components: [],
-      })
+      });
       await wait(500);
       await interaction.deleteReply();
-      
     });
   }
   static async StardomCollector(
@@ -322,7 +319,12 @@ module.exports = class CollectorController {
         updatedImage = card.image;
         await userCard.save();
         i.update({
-          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "Moldura Padrão aplicada.")],
+          embeds: [
+            await EmbedController.getUpdatedEmbed(
+              updatedImage,
+              "Moldura Padrão aplicada."
+            ),
+          ],
           components: [stardomButtons, quitButton],
         });
         return;
@@ -335,7 +337,12 @@ module.exports = class CollectorController {
           "/e_sepia/e_colorize:30,co_rgb:ff7700/bo_5px_solid_rgb:ff8000/"
         );
         i.update({
-          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "✅Moldura de bronze aplicada.✅")],
+          embeds: [
+            await EmbedController.getUpdatedEmbed(
+              updatedImage,
+              "✅Moldura de bronze aplicada.✅"
+            ),
+          ],
           components: [stardomButtons, quitButton],
         });
         return;
@@ -348,7 +355,12 @@ module.exports = class CollectorController {
           "/e_sepia/e_colorize:30,co_rgb:8a8680/bo_5px_solid_rgb:8a8680/"
         );
         i.update({
-          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "✅Moldura de prata aplicada.✅")],
+          embeds: [
+            await EmbedController.getUpdatedEmbed(
+              updatedImage,
+              "✅Moldura de prata aplicada.✅"
+            ),
+          ],
           components: [stardomButtons, quitButton],
         });
         return;
@@ -360,7 +372,12 @@ module.exports = class CollectorController {
           "/e_sepia/e_colorize:30,co_rgb:fff700/bo_5px_solid_rgb:fff700/"
         );
         i.update({
-          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "✅Moldura de ouro aplicada.✅")],
+          embeds: [
+            await EmbedController.getUpdatedEmbed(
+              updatedImage,
+              "✅Moldura de ouro aplicada.✅"
+            ),
+          ],
           components: [stardomButtons, quitButton],
         });
         return;
@@ -372,13 +389,16 @@ module.exports = class CollectorController {
           "/e_sepia/e_colorize:30,co_rgb:ff00e1/bo_5px_solid_rgb:883db8/"
         );
         i.update({
-          embeds: [await EmbedController.getUpdatedEmbed(updatedImage, "✅Moldura de irídio aplicada.✅")],
+          embeds: [
+            await EmbedController.getUpdatedEmbed(
+              updatedImage,
+              "✅Moldura de irídio aplicada.✅"
+            ),
+          ],
           components: [stardomButtons, quitButton],
         });
         return;
       }
-
-
 
       if (i.customId === "quit") {
         collector.stop();
@@ -390,12 +410,87 @@ module.exports = class CollectorController {
       await interaction.editReply({
         content: "✅Saida realizada com sucesso.✅",
         components: [],
-      })
+      });
       await wait(500);
       await interaction.deleteReply();
+    });
+  }
+  static async StartBattleCollector(
+    interaction,
+    challenge,
+    challengedUser,
+    turnosQty,
+    discordID,
+    activeInteractions
+  ) {
+    const filter = (reaction, user) => {
+      if (user.bot) return false; // Impede que bots ativem a reação
       
+      if (reaction.emoji.name === "👍" && challengedUser.id === user.id) return true;
+      if (reaction.emoji.name === "👎" && challengedUser.id === user.id) return true;
+      if (reaction.emoji.name === "❌" && user.id === discordID) return true;
+      
+      return false; // Se não for nenhuma das opções, retorna falso
+    };
+    const collector = challenge.createReactionCollector({
+      filter,
+      time: 300000, //5 minutos
+    });
+
+    collector.on("collect", async (reaction) => {
+      if (reaction.emoji.name === "👍") {
+        await interaction.editReply({
+          content: `<@${challengedUser.id}> aceitou o desafio!`,
+        });
+
+        // defina que os usuários estão em batalha
+        const user1 = await User.findOne({ where: { discordID: discordID } });
+        const user2 = await User.findOne({
+          where: { discordID: challengedUser.id },
+        });
+        //user1.IsInBattle = true;
+        //user2.IsInBattle = true;
+        //await user1.save();
+        //await user2.save();
+
+        const message = await interaction.fetchReply();
+
+        // Criar a thread a partir da mensagem de resposta
+        const thread = await message.startThread({
+          name: `${interaction.user.username} vs ${challengedUser.username}`,
+          autoArchiveDuration: 1440, // 24 horas (1440 minutos)
+          reason: "Tópico para separar as batalhas",
+        });
+        console.log(`${thread.name} criado com sucesso!`);
+
+        activeInteractions.delete(discordID);
+        // inicie o setup da batalha
+        await BattleController.BattleSetup(
+          user1,
+          user2,
+          thread,
+          turnosQty,
+        );
+        await wait(3000);
+        return;
+      } else if (reaction.emoji.name === "👎") {
+        await interaction.editReply({
+          content: `<@${challengedUser.id}> recusou o desafio!`,
+        });
+        activeInteractions.delete(discordID);
+        collector.stop();
+        return;
+      } else if (reaction.emoji.name === "❌") {
+        await interaction.editReply({
+          content: `<@${interaction.user.id}> cancelou o desafio!`,
+        });
+        activeInteractions.delete(discordID);
+        collector.stop();
+      }
+    });
+    collector.on("end", async () => {
+      await wait(2000);
+      await interaction.deleteReply();
     });
   }
 };
-
-

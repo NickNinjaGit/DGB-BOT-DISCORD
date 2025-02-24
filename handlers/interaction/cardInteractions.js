@@ -192,7 +192,7 @@ async function Collection(interaction, activeInteractions) {
     fetchReply: true
   })
   activeInteractions.add(discordID);
-  CollectorController.CollectionController(interaction, discordID, currentCardIndex, navButtons, activeInteractions)
+  CollectorController.CollectionCollector(interaction, discordID, currentCardIndex, navButtons, activeInteractions)
 }
 async function BuyCard(interaction) {
   const userId = interaction.user.id;

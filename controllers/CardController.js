@@ -80,6 +80,28 @@ module.exports = class CardController {
       skill2: skill2 ? skill2.dataValues : null, // Inclui os campos da skill2 no objeto
     };
   }
+  static async getUserCardByName(user, name)
+  {
+    const card = await Card.findOne({ where: { name: name } });
+    if(!card) return null;
+    const userCard = await UserCards.findOne({ where: { userId: user.id, cardId: card.id } });
+    if(!userCard) return null;
+
+    const rarity_info = await CardController.checkRarity(card.rarity);
+    const skill1 = await Skill.findOne({ where: { id: card.SKILL1 } });
+    const skill2 = await Skill.findOne({ where: { id: card.SKILL2 } });
+
+    return {
+      name: card.name,
+      description: card.description,
+      HP: card.HP,
+      MANA: card.MANA,
+      ...userCard.dataValues, // Inclui os campos do card no objeto
+      rarity: rarity_info,
+      skill1: skill1 ? skill1.dataValues : null, // Inclui os campos da skill1 no objeto
+      skill2: skill2 ? skill2.dataValues : null, // Inclui os campos da skill2 no objeto
+    };
+  }
   static async getAllCards() {
     const cards = await Card.findAll({
       order: [
@@ -129,24 +151,6 @@ module.exports = class CardController {
       })
     );
     return cardList;
-  }
-  static async getCardCollection(userId) {
-    const user = await User.findOne({ where: { discordID: userId } });
-    // compare cards that user has with all cards
-    const cards = await Card.findAll({
-      order: [
-        ["id", "ASC"],
-        ["name", "ASC"],
-      ],
-    });
-
-    const userCards = await UserCards.findAll({ where: { userId: user.id } });
-
-    const cardsQty = userCards.length;
-
-    const lastCard = cards[cards.length - 1].id;
-
-    return { cardsQty, lastCard };
   }
 
   static async BuyCard(discordID, cardName) {
