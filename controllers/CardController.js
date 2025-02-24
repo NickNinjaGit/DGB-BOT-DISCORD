@@ -153,6 +153,25 @@ module.exports = class CardController {
     return cardList;
   }
 
+  static async getUserCardsListed(userId) {
+    const user = await User.findOne({ where: { discordID: userId } });
+    // compare cards that user has with all cards
+    const cards = await Card.findAll({
+      order: [
+        ["id", "ASC"],
+        ["name", "ASC"],
+      ],
+    });
+
+    const userCards = await UserCards.findAll({ where: { userId: user.id } });
+
+    const cardsQty = userCards.length;
+
+    const lastCard = cards[cards.length - 1].id;
+
+    return { cardsQty, lastCard };
+  }
+
   static async BuyCard(discordID, cardName) {
     const user = await User.findOne({ where: { discordID } });
     const card = await Card.findOne({

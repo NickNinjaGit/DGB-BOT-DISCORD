@@ -11,7 +11,7 @@ const checkSkillType = require("../helpers/checkSkillType");
 module.exports = class EmbedController {
   static async ShowUserProfile(discordId, displayImage) {
     const user = await User.findOne({ where: { discordID: discordId } });
-    const cardCollection = await CardController.getCardCollection(discordId);
+    const cardCollection = await CardController.getUserCardsListed(discordId);
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
