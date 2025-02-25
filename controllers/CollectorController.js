@@ -1,6 +1,6 @@
 const EmbedController = require("./EmbedController");
-const CardController = require("./CardController");
-const BattleController = require("./BattleController");
+const CardService = require("../services/CardService");
+const BattleService = require("../services/BattleService");
 
 const User = require("../models/User");
 
@@ -132,7 +132,7 @@ module.exports = class CollectorController {
       time: 600000, // 10 minutos
     });
 
-    const cards = await CardController.getAllCards();
+    const cards = await CardService.getAllCards();
 
     collector.on("collect", async (i) => {
       if (i.customId === "next") {
@@ -331,7 +331,7 @@ module.exports = class CollectorController {
       }
 
       if (i.customId === "stardom-bronze") {
-        updatedImage = await CardController.ChangeStardomImage(
+        updatedImage = await CardService.ChangeStardomImage(
           userCard,
           card,
           "/e_sepia/e_colorize:30,co_rgb:ff7700/bo_5px_solid_rgb:ff8000/"
@@ -349,7 +349,7 @@ module.exports = class CollectorController {
       }
 
       if (i.customId === "stardom-silver") {
-        updatedImage = await CardController.ChangeStardomImage(
+        updatedImage = await CardService.ChangeStardomImage(
           userCard,
           card,
           "/e_sepia/e_colorize:30,co_rgb:8a8680/bo_5px_solid_rgb:8a8680/"
@@ -366,7 +366,7 @@ module.exports = class CollectorController {
         return;
       }
       if (i.customId === "stardom-gold") {
-        updatedImage = await CardController.ChangeStardomImage(
+        updatedImage = await CardService.ChangeStardomImage(
           userCard,
           card,
           "/e_sepia/e_colorize:30,co_rgb:fff700/bo_5px_solid_rgb:fff700/"
@@ -383,7 +383,7 @@ module.exports = class CollectorController {
         return;
       }
       if (i.customId === "stardom-iridium") {
-        updatedImage = await CardController.ChangeStardomImage(
+        updatedImage = await CardService.ChangeStardomImage(
           userCard,
           card,
           "/e_sepia/e_colorize:30,co_rgb:ff00e1/bo_5px_solid_rgb:883db8/"
@@ -465,7 +465,7 @@ module.exports = class CollectorController {
 
         activeInteractions.delete(discordID);
         // inicie o setup da batalha
-        await BattleController.BattleSetup(
+        await BattleService.BattleSetup(
           user1,
           user2,
           thread,
@@ -491,6 +491,41 @@ module.exports = class CollectorController {
     collector.on("end", async () => {
       await wait(2000);
       await interaction.deleteReply();
+    });
+  }
+  static async BattleFlowCollector(thread, currentUser)
+  {
+    await new Promise((resolve) => {
+      const collector = battleMessage.createMessageComponentCollector({
+        filter: (i) => {
+          console.log(
+            `Usuário que interagiu: ${i.user.id}, esperado: ${currentUser.discordID}`
+          );
+          return i.user.id === currentUser.discordID;
+        },
+        time: 300000, // 5 min para responder
+      });
+
+      collector.on("collect", async (interaction) => {
+        console.log(`Interação recebida: ${interaction.customId}`);
+        if (interaction.customId === "attack") {
+          await interaction.reply({
+            content: `# Teste ataque`,
+            ephemeral: true, // Torna a resposta visível apenas para o usuário
+          });
+          resolve();
+          collector.stop();
+        }
+      });
+  
+      collector.on("end", (collected, reason) => {
+        if (reason === "time") {
+          console.log(`⏳ Tempo esgotado para ${currentUser.name}`);
+          thread.send({
+            content: `⚠️ ${currentUser.name} não respondeu a tempo!`,
+          });
+        }
+      });
     });
   }
 };

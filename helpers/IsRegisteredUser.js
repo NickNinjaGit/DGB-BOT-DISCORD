@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const PackageController = require('../controllers/PackageController');
+const PackageController = require('../services/PackageService');
 
 
 

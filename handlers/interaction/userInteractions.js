@@ -1,11 +1,10 @@
 // Controllers
-const BattleController = require("../../controllers/BattleController");
 const EmbedController = require("../../controllers/EmbedController");
 const CollectorController = require("../../controllers/CollectorController");
-const CardController = require("../../controllers/CardController");
 const ButtonController = require("../../controllers/ButtonController");
-const PackageController = require("../../controllers/PackageController");
-
+// Services
+const CardService = require("../../services/CardService");
+const PackageService = require("../../services/PackageService");
 // Models
 const User = require("../../models/User");
 // helpers
@@ -219,13 +218,13 @@ async function Shop(interaction, activeInteractions) {
   }
 
   //get all cards from collection
-  const cardList = await CardController.getAllCards();
-  const packageList = await PackageController.getAllPackages(user);
-
+  const packageList = await PackageService.getAllPackages(user);
+  
   // setting cards pagination to shop
-  let pageId = 1;
-
+  const cardList = await CardService.getAllCards();
+  
   const ItensPerPage = 3;
+  let pageId = 1;
 
   // Faz um calculo de total de páginas considerando as páginas quebradiças
   const totalPages = Math.ceil(cardList.length / ItensPerPage);

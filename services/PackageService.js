@@ -1,6 +1,6 @@
 const Package = require("../models/Package");
 const { Op } = require("sequelize");
-const CardController = require("./CardController");
+const CardService = require("./CardService");
 const UserCards = require("../models/UserCards");
 
 module.exports = class PackageController {
@@ -137,7 +137,7 @@ module.exports = class PackageController {
     }
     pack.qty -= 1;
     await pack.save();
-    const generatedCards = await CardController.AddCard(settings.quantityOutput, settings.rarityFilters);
+    const generatedCards = await CardService.AddCard(settings.quantityOutput, settings.rarityFilters);
     //for each generated card, give it to user
     for (let i = 0; i < generatedCards.length; i++) {
       // check if user has card in inventory

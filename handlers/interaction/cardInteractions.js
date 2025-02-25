@@ -1,16 +1,16 @@
 // Controllers
 const EmbedController = require("../../controllers/EmbedController");
-const CardController = require("../../controllers/CardController");
 const ButtonController = require("../../controllers/ButtonController");
-const PackageController = require("../../controllers/PackageController");
 const CollectorController = require("../../controllers/CollectorController");
 
+// Services
+const CardService = require("../../services/CardService");
+const PackageService = require("../../services/PackageService");
 // Models
 const User = require("../../models/User");
 const UserCards = require("../../models/UserCards");
 // validators
 const cardExist = require("../validations/cardExist");
-const userHasCards = require("../validations/userHasCards");
 // helpers
 const wait = require("node:timers/promises").setTimeout;
 const checkActiveInteractions = require("../../helpers/checkActiveInteractions");
@@ -34,7 +34,7 @@ async function findCard(interaction, activeInteractions) {
 
   // Lógica principal do comando
   const cardName = interaction.options.getString("card");
-  const card = await CardController.getCardByName(cardName);
+  const card = await CardService.getCardByName(cardName);
 
   if (!card) {
     await interaction.reply({
@@ -73,7 +73,7 @@ async function MyCards(interaction, activeInteractions) {
     return;
   }
   // get all user cards
-  const userCards = await CardController.getUserCards(user);
+  const userCards = await CardService.getUserCards(user);
 
   // check if user doesn't have any card
   if (userCards.length === 0) {
@@ -107,7 +107,7 @@ async function OpenPack(interaction) {
   const discordID = interaction.user.id;
   const user = await User.findOne({ where: { discordID } });
   const packNameInput = interaction.options.getString("pack-name");
-  const userPackages = await PackageController.getUserPackages(user, packNameInput);
+  const userPackages = await PackageService.getUserPackages(user, packNameInput);
 
 
   // check if package exists
@@ -141,7 +141,7 @@ async function OpenPack(interaction) {
   }
 
   // Open pack
-  const gainedCards = await PackageController.OpenPack(user, packNameInput);
+  const gainedCards = await PackageService.OpenPack(user, packNameInput);
   if(gainedCards === true)
     {
       await interaction.reply({
@@ -173,7 +173,7 @@ async function Collection(interaction, activeInteractions) {
   }
 
   // get all cards from collection
-  const cards = await CardController.getAllCards();
+  const cards = await CardService.getAllCards();
 
   let currentCardIndex = 0;
   const currentCard = cards[currentCardIndex];
@@ -198,7 +198,7 @@ async function BuyCard(interaction) {
   const userId = interaction.user.id;
   const cardName = interaction.options.getString("card");
   const user = await User.findOne({ where: { discordID: userId } });
-  const card = await CardController.getCardByName(cardName);
+  const card = await CardService.getCardByName(cardName);
 
   const buyGif = new AttachmentBuilder(`${img_folder}/buy.gif`);
 
@@ -230,7 +230,7 @@ async function BuyCard(interaction) {
   }
 
   // buy card
-  await CardController.BuyCard(userId, cardName);
+  await CardService.BuyCard(userId, cardName);
   user.wallet -= card.price;
   user.inventory += 1;
   await user.save();
@@ -246,7 +246,7 @@ async function SellCard(interaction) {
   const cardName = interaction.options.getString("card");
   const quantity = interaction.options.getInteger("quantity");
   const user = await User.findOne({ where: { discordID: discordID } });
-  const card = await CardController.getCardByName(cardName);
+  const card = await CardService.getCardByName(cardName);
 
   const sellGif = new AttachmentBuilder(`${img_folder}/sell.gif`);
 
@@ -277,7 +277,7 @@ async function SellCard(interaction) {
   }
 
   // sell card
-  await CardController.SellCard(discordID, cardName, quantity);
+  await CardService.SellCard(discordID, cardName, quantity);
   // get money add qty
   const moneyAdded = card.sellValue * quantity;
   await interaction.reply({
@@ -293,7 +293,7 @@ async function BuyPack(interaction) {
   const user = await User.findOne({ where: { discordID } });
   const packName = interaction.options.getString("pack-name");
   const qty = interaction.options.getInteger("quantity");
-  const package = await PackageController.getPackageByName(packName);
+  const package = await PackageService.getPackageByName(packName);
   const buyGif = new AttachmentBuilder(`${img_folder}/buy.gif`);
 
   // check if package exists
@@ -318,7 +318,7 @@ async function BuyPack(interaction) {
   }
 
   // buy pack
-  await PackageController.BuyPackage(user, package, qty);
+  await PackageService.BuyPackage(user, package, qty);
 
   // send message
   interaction.reply({
@@ -372,7 +372,7 @@ async function SetStardom(interaction, activeInteractions) {
         return;
     }
 
-    const card = await CardController.getCardByName(cardInput);
+    const card = await CardService.getCardByName(cardInput);
     const userCard = await UserCards.findOne({ where: { userId: user.id, cardId: card.id } });
     const cardName = card.name;
     const starPoints = userCard.starPoints;
@@ -388,7 +388,7 @@ async function SetStardom(interaction, activeInteractions) {
     }
 
     // set stardom 
-    const stardomTier = await CardController.checkStardomTier(userCard);
+    const stardomTier = await CardService.checkStardomTier(userCard);
 
     
     // embed

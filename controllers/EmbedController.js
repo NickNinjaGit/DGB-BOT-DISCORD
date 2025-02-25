@@ -2,8 +2,8 @@ const { EmbedBuilder } = require("discord.js");
 // Models
 const User = require("../models/User");
 // controllers
-const CardController = require("../controllers/CardController");
-const PackageController = require("../controllers/PackageController");
+const CardService = require("../services/CardService");
+const PackageService = require("../services/PackageService");
 
 // helpers
 const checkSkillType = require("../helpers/checkSkillType");
@@ -11,7 +11,7 @@ const checkSkillType = require("../helpers/checkSkillType");
 module.exports = class EmbedController {
   static async ShowUserProfile(discordId, displayImage) {
     const user = await User.findOne({ where: { discordID: discordId } });
-    const cardCollection = await CardController.getUserCardsListed(discordId);
+    const cardCollection = await CardService.getUserCardsListed(discordId);
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
@@ -51,7 +51,7 @@ module.exports = class EmbedController {
   }
   static async ShowPackageInfo(discordID) {
     const user = await User.findOne({ where: { discordID } });
-    const packs = await PackageController.getPackagesQty(user.id);
+    const packs = await PackageService.getPackagesQty(user.id);
 
     const embed = new EmbedBuilder()
       .setAuthor({ name: "⠀⠀⠀⠀⠀⠀" })
