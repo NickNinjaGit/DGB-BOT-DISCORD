@@ -1,4 +1,4 @@
-const loadSkills = require('../skills/skillList');
+const loadSkills = require('../skills/skill-handler');
 const fs = require('fs');
 const path = require('path');
 const createCard  = require('./createCard');

@@ -15,5 +15,22 @@
         "SPEED": 30,
         "SKILL1": "Fire Blast",
         "SKILL2": "Taunt"
+    },
+    {
+        "name": "Natsu Dragneel",
+        "description": "Natsu from Fairy Tail",
+        "universe": "Fairy Tail",
+        "image": "https://static.wikia.nocookie.net/fairytail/images/c/ca/Natsu_X792.png/revision/latest?cb=20181111122101",
+        "rarity": "rare",
+        "price": 250,
+        "sellValue": 200,
+        "tradable": true,
+        "HP": 500,
+        "MANA": 100,
+        "ATK": 50,
+        "DEF": 200,
+        "SPEED": 100,
+        "SKILL1": "Fire Blast",
+        "SKILL2": "Taunt"
     }
 ]

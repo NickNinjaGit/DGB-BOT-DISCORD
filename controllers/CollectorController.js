@@ -422,14 +422,17 @@ module.exports = class CollectorController {
     turnosQty,
     discordID,
     activeInteractions
-  ) {
+  ) 
+  {
     const filter = (reaction, user) => {
       if (user.bot) return false; // Impede que bots ativem a reação
-      
-      if (reaction.emoji.name === "👍" && challengedUser.id === user.id) return true;
-      if (reaction.emoji.name === "👎" && challengedUser.id === user.id) return true;
+
+      if (reaction.emoji.name === "👍" && challengedUser.id === user.id)
+        return true;
+      if (reaction.emoji.name === "👎" && challengedUser.id === user.id)
+        return true;
       if (reaction.emoji.name === "❌" && user.id === discordID) return true;
-      
+
       return false; // Se não for nenhuma das opções, retorna falso
     };
     const collector = challenge.createReactionCollector({
@@ -465,12 +468,7 @@ module.exports = class CollectorController {
 
         activeInteractions.delete(discordID);
         // inicie o setup da batalha
-        await BattleService.BattleSetup(
-          user1,
-          user2,
-          thread,
-          turnosQty,
-        );
+        await BattleService.BattleSetup(user1, user2, thread, turnosQty);
         await wait(3000);
         return;
       } else if (reaction.emoji.name === "👎") {
@@ -491,41 +489,6 @@ module.exports = class CollectorController {
     collector.on("end", async () => {
       await wait(2000);
       await interaction.deleteReply();
-    });
-  }
-  static async BattleFlowCollector(thread, currentUser)
-  {
-    await new Promise((resolve) => {
-      const collector = battleMessage.createMessageComponentCollector({
-        filter: (i) => {
-          console.log(
-            `Usuário que interagiu: ${i.user.id}, esperado: ${currentUser.discordID}`
-          );
-          return i.user.id === currentUser.discordID;
-        },
-        time: 300000, // 5 min para responder
-      });
-
-      collector.on("collect", async (interaction) => {
-        console.log(`Interação recebida: ${interaction.customId}`);
-        if (interaction.customId === "attack") {
-          await interaction.reply({
-            content: `# Teste ataque`,
-            ephemeral: true, // Torna a resposta visível apenas para o usuário
-          });
-          resolve();
-          collector.stop();
-        }
-      });
-  
-      collector.on("end", (collected, reason) => {
-        if (reason === "time") {
-          console.log(`⏳ Tempo esgotado para ${currentUser.name}`);
-          thread.send({
-            content: `⚠️ ${currentUser.name} não respondeu a tempo!`,
-          });
-        }
-      });
     });
   }
 };

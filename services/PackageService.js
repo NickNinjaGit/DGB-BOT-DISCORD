@@ -156,6 +156,8 @@ module.exports = class PackageController {
         userId: user.id,
         cardId: generatedCards[i].id,
         quantity: 0,
+        starPoints: 0,
+        stardomTier: "N/A",
         currentIMG: generatedCards[i].image,
         currentHP: generatedCards[i].HP,
         currentMANA: generatedCards[i].MANA,

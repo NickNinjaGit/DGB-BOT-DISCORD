@@ -1,30 +1,30 @@
 [
-{
-   "name": "Fire Blast", 
-   "description": "A fire blast", 
-    "Is Gif": "true", 
+  {
+    "name": "Fire Blast",
+    "description": "A fire blast",
+    "isGif": "true",
     "image": "https://platform.polygon.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/3795372/cuphead_dragon_8.0.gif",
     "cost": 50,
-    "SkillType": "DAMAGE", 
-   "SkillValue": 200, 
-   "StatusChangeType": "", 
-    "SkillMultiplier": 0, 
-    "Accurracy": 1, 
-    "HitTimes": 1, 
-    "Duration": 0 
-},
-{
-    "name":  "Taunt",
-   "description": "Taunts the enemy",
-    "Is Gif": true,
+    "SkillType": "DAMAGE",
+    "SkillValue": 200,
+    "StatusChangeType": "",
+    "SkillMultiplier": 0,
+    "Accurracy": 1,
+    "HitTimes": 1,
+    "Duration": 0
+  },
+  {
+    "name": "Taunt Alteração",
+    "description": "Taunts the enemy",
+    "isGif": true,
     "image": "https://media.tenor.com/bfwyHpyc3W0AAAAM/krillin-taunt.gif",
-    "cost": 10,
+    "cost": 20,
     "SkillType": "DEBUFF",
-   "SkillValue": 0,  
-   "StatusChangeType": "DEF",  
+    "SkillValue": 0,
+    "StatusChangeType": "DEF",
     "SkillMultiplier": "0.5",
-    "Accurracy": 1,  
-    "HitTimes": 1, 
+    "Accurracy": 1,
+    "HitTimes": 1,
     "Duration": 2
-}
+  }
 ]

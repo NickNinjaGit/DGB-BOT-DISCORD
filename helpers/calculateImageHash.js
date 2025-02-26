@@ -1,7 +1,7 @@
 const crypto = require('crypto');
-
 async function calculateImageHash(imageURL) {
     try {
+ 
         const hash = crypto.createHash('sha256').update(imageURL).digest('hex');
         return hash;
     } catch (error) {

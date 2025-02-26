@@ -18,7 +18,7 @@ const UserCards = require("./models/UserCards");
 const Skill = require("./models/Skill");
 // handlers
 const handleInteraction = require("./handlers/interaction/interaction-handler.js");
-const loadCards = require("./handlers/cards/cardList");
+const loadCards = require("./handlers/cards/card-handler");
 
 // logger
 const logger = require("./logger");

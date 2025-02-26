@@ -109,10 +109,24 @@ module.exports = class ButtonController {
         .setLabel(`Defender`)
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
+        .setCustomId('dodge')
+        .setLabel(`Esquivar`)
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
         .setCustomId("skillList")
         .setLabel(`Skills`)
         .setStyle(ButtonStyle.Success),
     )
     return battleRow;
+  }
+  static async ForfeitButton()
+  {
+    const forfeitRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("forfeit")
+        .setLabel(`Desistir`)
+        .setStyle(ButtonStyle.Secondary)
+    );
+    return forfeitRow;
   }
 };

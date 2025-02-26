@@ -1,9 +1,13 @@
 const ButtonController = require("../controllers/ButtonController");
 const EmbedController = require("../controllers/EmbedController");
-const CollectorController = require("../controllers/CollectorController");
 const CardService = require("./CardService");
 const wait = require("node:timers/promises").setTimeout;
 
+
+
+// helpers
+const checkFirstTurnPlayer = require("../helpers/checkFirstTurnPlayer");
+const BattleHelper = require("../helpers/BattleHelper");
 module.exports = class BattleController {
   static async BattleSetup(user1, user2, thread, turnosQty) {
     // TODO
@@ -30,7 +34,6 @@ module.exports = class BattleController {
             const response = await thread.send({
               content: `🃏**<@${user.discordID}> escolheu a carta ${choicedCard.name}**🃏`,
             });
-            await wait(1000);
             await response.delete();
             resolve(choicedCard);
             collector.stop();
@@ -98,119 +101,21 @@ module.exports = class BattleController {
     const cardEmbedA = await EmbedController.ShowBattleCard(cardA);
     const cardEmbedB = await EmbedController.ShowBattleCard(cardB);
     const battleButtons = await ButtonController.BattleButtons();
+    const forfeitButton = await ButtonController.ForfeitButton();
 
-    while (turns !== turnosQty || cardA.currentHP > 0 || cardB.currentHP > 0) {
-      let currentUser = null;
-      //if cards have the same speed
-      if (cardA.currentSPEED === cardB.currentSPEED) {
-        const random = Math.floor(Math.random() * 100);
+    while (turns < turnosQty && cardA.currentHP > 0 && cardB.currentHP > 0) {
+      //check who starts turn
+      const BattleOrder = await checkFirstTurnPlayer(cardA, cardB, turns, turnosQty, user1, user2, cardEmbedA, cardEmbedB, battleButtons, forfeitButton, thread);
+      const AttackerAction = await BattleHelper.BattleAttackerCollector(thread, BattleOrder.currentAttacker);
+      console.log("Ação do Atacante: " + AttackerAction);
+      const DefenderAction = await BattleHelper.BattleDefenderCollector(thread, BattleOrder.currentDefender, user1, cardEmbedA, cardEmbedB);
+      console.log("Defensor respondeu com: " + DefenderAction);
+      console.log("FIM DO CICLO! PARABENS!")
 
-        if (random % 2 === 0) {
-          currentUser = user1;
-         await thread.send({
-            embeds: [cardEmbedA],
-            components: [battleButtons],
-          });
-
-          await thread.send({
-            content: `# Turno ${turns + 1} de ${turnosQty}, vez de ${
-              user1.name
-            }`,
-          });
-          await thread.send({
-            content: `💨**As cartas ${cardA.name} e ${cardB.name} têm a mesma velocidade. Por decisão do bot, será a vez de ${user1.name} primeiro 💨**`,
-          });
-
-          console.log(
-            `Turno do usuário: ${currentUser.name} (${currentUser.discordID})`
-          );
-
-          // Criar coletor na própria mensagem com botões
-          
-     
-          const response = await CollectorController.BattleFlowCollector(currentUser, thread);
-          ActionPending.resolve(response);
-          return;
-        } else {
-          currentUser = user2;
-          const battleMessage = await thread.send({
-            embeds: [cardEmbedB],
-            components: [battleButtons],
-          });
-
-          await thread.send({
-            content: `# Turno ${turns + 1} de ${turnosQty}, vez de ${
-              user2.name
-            }`,
-          });
-          await thread.send({
-            content: `💨**As cartas ${cardA.name} e ${cardB.name} têm a mesma velocidade. Por decisão do bot, será a vez de ${user2.name} primeiro 💨**`,
-          });
-
-          console.log(
-            `Turno do usuário: ${currentUser.name} (${currentUser.discordID})`
-          );
-
-          // Criar coletor na mensagem dos botões
-          await new Promise((resolve) => {
-            const collector = battleMessage.createMessageComponentCollector({
-              filter: (i) => {
-                console.log(
-                  `Usuário que interagiu: ${i.user.id}, esperado: ${currentUser.discordID}`
-                );
-                return i.user.id === currentUser.discordID;
-              },
-              time: 300000,
-            });
-
-            collector.on("collect", async (interaction) => {
-              console.log(`Interação recebida: ${interaction.customId}`);
-              if (interaction.customId === "attack") {
-                await interaction.reply({
-                  content: `# Teste ataque`,
-                  ephemeral: true,
-                });
-
-                resolve(interaction);
-                collector.stop();
-              }
-            });
-
-            collector.on("end", (reason) => {
-              if (reason === "time") {
-                thread.send({
-                  content: `⚠️ ${currentUser.name} não respondeu a tempo! Vitória por desconexão concedida para ao adversário!`,
-                });
-              }
-            });
-          });
-        }
-      }
-      // if cards have different speed
-      const firstTurnPlayer = cardA.SPEED > cardB.SPEED ? cardA : cardB;
-      if (firstTurnPlayer === cardA) {
-        await thread.send({
-          content: `@${user1.name} vai iniciar o combate por ter maior velocidade`,
-        });
-        await thread.send({
-          content: `# Turno ${turns + 1} de ${turnosQty} vez de @${user1.name}`,
-        });
-        await thread.send(
-          { embeds: [cardEmbedA] },
-          { content: `O que você deseja fazer?` }
-        );
-      } else if (firstTurnPlayer === cardB) {
-        await thread.send({
-          content: `@${user2.name} vai iniciar o combate por ter maior velocidade`,
-        });
-        await thread.send({
-          content: `# Turno ${turns + 1} de ${turnosQty} vez de @${user2.name}`,
-        });
-        await thread.send(
-          { embeds: [cardEmbedB] },
-          { content: `O que você deseja fazer?` }
-        );
-      } 
+      
+      turns++;
+  
+      
     }
   }
 };
