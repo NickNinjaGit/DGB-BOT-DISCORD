@@ -8,7 +8,6 @@ module.exports = async function checkFirstTurnPlayer(
   cardEmbedA,
   cardEmbedB,
   battleButtons,
-  forfeitButton,
   thread
 ) {
   // check if cards have the same speed
@@ -19,10 +18,10 @@ module.exports = async function checkFirstTurnPlayer(
     // if odd, user1 goes first
     if (random % 2 === 0) {
       const currentAttacker = user1;
-      const currentDefender = user2;
+      const currentDefensor = user2;
       await thread.send({
         embeds: [cardEmbedA],
-        components: [battleButtons, forfeitButton],
+        components: [battleButtons.actionRow],
       });
 
       await thread.send({
@@ -35,15 +34,15 @@ module.exports = async function checkFirstTurnPlayer(
       console.log(
         `Turno do usuário: ${currentAttacker.name} (${currentAttacker.discordID})`
       );
-      return { currentAttacker, currentDefender };
+      return { currentAttacker, currentDefensor };
     }
     // if even, user2 goes first
     else {
       const currentAttacker = user2;
-      const currentDefender = user1;
+      const currentDefensor = user1;
       await thread.send({
         embeds: [cardEmbedB],
-        components: [battleButtons, forfeitButton],
+        components: [battleButtons.actionRow],
       });
 
       await thread.send({
@@ -56,7 +55,7 @@ module.exports = async function checkFirstTurnPlayer(
       console.log(
         `Turno do usuário: ${currentAttacker.name} (${currentAttacker.discordID})`
       );
-      return { currentAttacker, currentDefender };
+      return { currentAttacker, currentDefensor };
     }
   }
   else 
@@ -64,10 +63,10 @@ module.exports = async function checkFirstTurnPlayer(
     const firstPlayer = cardA.currentSPEED > cardB.currentSPEED ? cardA : cardB;
       if (firstPlayer === cardA) {
         const currentAttacker = user1;
-        const currentDefender = user2;
+        const currentDefensor = user2;
         await thread.send(
             { embeds: [cardEmbedA] ,
-            components: [battleButtons, forfeitButton]},
+            components: [battleButtons.actionRow]},
         );
         await thread.send({
           content: `💨**${cardA.name} possui maior velocidade.**💨`,
@@ -76,14 +75,14 @@ module.exports = async function checkFirstTurnPlayer(
           content: `# Turno ${turns + 1} de ${turnosQty} vez de @${user1.name}`,
         });
 
-        return { currentAttacker, currentDefender };
+        return { currentAttacker, currentDefensor };
         
       } else if (firstPlayer === cardB) {
         const currentAttacker = user2;
-        const currentDefender = user1;
+        const currentDefensor = user1;
         await thread.send(
             { embeds: [cardEmbedB],
-            components: [battleButtons, forfeitButton]},
+            components: [battleButtons.actionRow]},
           );
         await thread.send({
           content: `💨**${user2.name} possui maior velocidade.**💨`,
@@ -92,7 +91,7 @@ module.exports = async function checkFirstTurnPlayer(
           content: `# Turno ${turns + 1} de ${turnosQty} vez de @${user2.name}`,
         });
 
-        return { currentAttacker, currentDefender };
+        return { currentAttacker, currentDefensor };
        
       } 
   }

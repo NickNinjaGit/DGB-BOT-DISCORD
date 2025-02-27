@@ -17,7 +17,7 @@ const Package = require("./models/Package");
 const UserCards = require("./models/UserCards");
 const Skill = require("./models/Skill");
 // handlers
-const handleInteraction = require("./handlers/interaction/interaction-handler.js");
+const InteractionController = require("./controllers/InteractionController")
 const loadCards = require("./handlers/cards/card-handler");
 
 // logger
@@ -56,7 +56,7 @@ logger.info("Aplicação iniciada com sucesso!");
 
 client.on(
   Events.InteractionCreate,
-  async (interaction) => await handleInteraction(interaction)
+  async (interaction) => await InteractionController(interaction)
 );
 
 client.login(process.env.TOKEN);

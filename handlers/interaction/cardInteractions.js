@@ -1,6 +1,6 @@
 // Controllers
-const EmbedController = require("../../controllers/EmbedController");
-const ButtonController = require("../../controllers/ButtonController");
+const EmbedView = require("../../views/EmbedView");
+const ButtonView = require("../../views/ButtonView");
 const CollectorController = require("../../controllers/CollectorController");
 
 // Services
@@ -45,8 +45,8 @@ async function findCard(interaction, activeInteractions) {
     return;
   }
 
-  const cardEmbed = await EmbedController.ShowCard(card);
-  const skillDetails = await ButtonController.SkillDetails(
+  const cardEmbed = await EmbedView.ShowCard(card);
+  const skillDetails = await ButtonView.SkillDetails(
     card.skill1.name,
     card.skill2.name,
   );
@@ -92,8 +92,8 @@ async function MyCards(interaction, activeInteractions) {
   let cardsPerPage = await Pagination(pageId, ItensPerPage, userCards);
 
   // show user cards
-  const userCardsEmbed = await EmbedController.ShowUserCards(cardsPerPage, pageId, totalPages);
-  const navButtons = await ButtonController.NavButtons();
+  const userCardsEmbed = await EmbedView.ShowUserCards(cardsPerPage, pageId, totalPages);
+  const navButtons = await ButtonView.NavButtons();
 
   await interaction.reply({
     embeds: [userCardsEmbed],
@@ -151,7 +151,7 @@ async function OpenPack(interaction) {
       await interaction.deleteReply();
       return;
     }
-  const packEmbed = await EmbedController.ShowPackCards(gainedCards);
+  const packEmbed = await EmbedView.ShowPackCards(gainedCards);
 
   
   await interaction.reply({
@@ -181,8 +181,8 @@ async function Collection(interaction, activeInteractions) {
   const totalPages = cards.length;
 
   // show collection
-  const collectionEmbed = await EmbedController.ShowCollection(currentCard, currentCard.id, totalPages);
-  const navButtons = await ButtonController.NavButtons();
+  const collectionEmbed = await EmbedView.ShowCollection(currentCard, currentCard.id, totalPages);
+  const navButtons = await ButtonView.NavButtons();
 
   activeInteractions.add(discordID);
 
@@ -253,7 +253,7 @@ async function SellCard(interaction) {
   // check if card exists
   await cardExist(card, interaction, discordID);
 
-  // check if user has the card
+  // check if user hasnt the card
   const userHasCard = await UserCards.findOne({
     where: { userId: user.id, cardId: card.id },
   });
@@ -392,9 +392,9 @@ async function SetStardom(interaction, activeInteractions) {
 
     
     // embed
-    const stardomSettings = await EmbedController.StardomSettings(stardomTier, starPoints, cardName, currentIMG);
-    const stardomButtons = (await ButtonController.StardomButtons(starPoints)).stardomRow;
-    const quitButton = (await ButtonController.StardomButtons()).quitRow;
+    const stardomSettings = await EmbedView.StardomSettings(stardomTier, starPoints, cardName, currentIMG);
+    const stardomButtons = (await ButtonView.StardomButtons(starPoints)).stardomRow;
+    const quitButton = (await ButtonView.StardomButtons()).quitRow;
 
 
     await interaction.reply({

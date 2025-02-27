@@ -1,4 +1,4 @@
-const EmbedController = require("./EmbedController");
+const EmbedView = require("../views/EmbedView");
 const CardService = require("../services/CardService");
 const BattleService = require("../services/BattleService");
 
@@ -9,6 +9,7 @@ const Pagination = require("../helpers/pagination");
 
 const wait = require("node:timers/promises").setTimeout;
 
+const { ChannelType } = require('discord.js');
 module.exports = class CollectorController {
   static async CardCollector(
     interaction,
@@ -25,14 +26,14 @@ module.exports = class CollectorController {
     // Configurar o coletor para ouvir interações nos botões
     collector.on("collect", async (i) => {
       if (i.customId === "skill1Details") {
-        const skill1Embed = await EmbedController.ShowSkill(card.skill1);
+        const skill1Embed = await EmbedView.ShowSkill(card.skill1);
         await i.update({
           embeds: [skill1Embed],
           components: [SkillDetails.backRow], // Mostrar botão de "voltar"
           fetchReply: true,
         });
       } else if (i.customId === "skill2Details") {
-        const skill2Embed = await EmbedController.ShowSkill(card.skill2);
+        const skill2Embed = await EmbedView.ShowSkill(card.skill2);
         await i.update({
           embeds: [skill2Embed],
           components: [SkillDetails.backRow], // Mostrar botão de "voltar"
@@ -72,7 +73,7 @@ module.exports = class CollectorController {
       time: 600000, // 10 minuto
     });
     let cardsPerPage = await Pagination(pageId, 3, cardList);
-    let userCardsEmbed = await EmbedController.ShowUserCards(
+    let userCardsEmbed = await EmbedView.ShowUserCards(
       cardsPerPage,
       pageId,
       totalPages
@@ -82,7 +83,7 @@ module.exports = class CollectorController {
       if (i.customId === "next") {
         pageId = pageId >= totalPages ? 1 : pageId + 1; // Volta para a primeira página se for a último
         cardsPerPage = await Pagination(pageId, 3, cardList);
-        userCardsEmbed = await EmbedController.ShowUserCards(
+        userCardsEmbed = await EmbedView.ShowUserCards(
           cardsPerPage,
           pageId,
           totalPages
@@ -95,7 +96,7 @@ module.exports = class CollectorController {
       } else if (i.customId === "previous") {
         pageId = pageId <= 1 ? totalPages : pageId - 1;
         cardsPerPage = await Pagination(pageId, 3, cardList);
-        userCardsEmbed = await EmbedController.ShowUserCards(
+        userCardsEmbed = await EmbedView.ShowUserCards(
           cardsPerPage,
           pageId,
           totalPages
@@ -140,7 +141,7 @@ module.exports = class CollectorController {
         currentCardIndex = (currentCardIndex + 1) % cards.length;
 
         const currentCard = cards[currentCardIndex];
-        const CollectionEmbed = await EmbedController.ShowCollection(
+        const CollectionEmbed = await EmbedView.ShowCollection(
           currentCard,
           currentCardIndex + 1, // Índice atual +1 para exibir como posição
           cards.length
@@ -158,7 +159,7 @@ module.exports = class CollectorController {
         currentCardIndex = (currentCardIndex - 1 + cards.length) % cards.length;
 
         const currentCard = cards[currentCardIndex];
-        const CollectionEmbed = await EmbedController.ShowCollection(
+        const CollectionEmbed = await EmbedView.ShowCollection(
           currentCard,
           currentCardIndex + 1, // Índice atual +1 para exibir como posição
           cards.length
@@ -200,7 +201,7 @@ module.exports = class CollectorController {
 
     // Configurar o coletor para ouvir interações nos botões
     collector.on("collect", async (i) => {
-      const ShowPackageInfo = await EmbedController.ShowPackageInfo(discordID);
+      const ShowPackageInfo = await EmbedView.ShowPackageInfo(discordID);
       if (i.customId === "pack-info") {
         await i.update({
           embeds: [ShowPackageInfo],
@@ -255,7 +256,7 @@ module.exports = class CollectorController {
 
         cardsPerPage = await Pagination(pageId, ItensPerPage, cardList);
         packagesPerPage = await Pagination(pageId, ItensPerPage, packageList);
-        shopEmbed = await EmbedController.ShowShop(
+        shopEmbed = await EmbedView.ShowShop(
           cardsPerPage,
           packagesPerPage,
           pageId,
@@ -271,7 +272,7 @@ module.exports = class CollectorController {
         pageId = pageId === 1 ? (pageId = totalPages) : (pageId = pageId - 1); // se a pagina for menor que 1, volta para a ultima
         cardsPerPage = await Pagination(pageId, ItensPerPage, cardList);
         packagesPerPage = await Pagination(pageId, ItensPerPage, packageList);
-        shopEmbed = await EmbedController.ShowShop(
+        shopEmbed = await EmbedView.ShowShop(
           cardsPerPage,
           packagesPerPage,
           pageId,
@@ -320,7 +321,7 @@ module.exports = class CollectorController {
         await userCard.save();
         i.update({
           embeds: [
-            await EmbedController.getUpdatedEmbed(
+            await EmbedView.getUpdatedEmbed(
               updatedImage,
               "Moldura Padrão aplicada."
             ),
@@ -338,7 +339,7 @@ module.exports = class CollectorController {
         );
         i.update({
           embeds: [
-            await EmbedController.getUpdatedEmbed(
+            await EmbedView.getUpdatedEmbed(
               updatedImage,
               "✅Moldura de bronze aplicada.✅"
             ),
@@ -356,7 +357,7 @@ module.exports = class CollectorController {
         );
         i.update({
           embeds: [
-            await EmbedController.getUpdatedEmbed(
+            await EmbedView.getUpdatedEmbed(
               updatedImage,
               "✅Moldura de prata aplicada.✅"
             ),
@@ -373,7 +374,7 @@ module.exports = class CollectorController {
         );
         i.update({
           embeds: [
-            await EmbedController.getUpdatedEmbed(
+            await EmbedView.getUpdatedEmbed(
               updatedImage,
               "✅Moldura de ouro aplicada.✅"
             ),
@@ -390,7 +391,7 @@ module.exports = class CollectorController {
         );
         i.update({
           embeds: [
-            await EmbedController.getUpdatedEmbed(
+            await EmbedView.getUpdatedEmbed(
               updatedImage,
               "✅Moldura de irídio aplicada.✅"
             ),
@@ -443,7 +444,7 @@ module.exports = class CollectorController {
     collector.on("collect", async (reaction) => {
       if (reaction.emoji.name === "👍") {
         await interaction.editReply({
-          content: `<@${challengedUser.id}> aceitou o desafio!`,
+          content: `<@${challengedUser.id}> aceitou o desafio! Acesse o tópico criado para entrar esse duelo!`,
         });
 
         // defina que os usuários estão em batalha
@@ -455,17 +456,18 @@ module.exports = class CollectorController {
         //user2.IsInBattle = true;
         //await user1.save();
         //await user2.save();
-
-        const message = await interaction.fetchReply();
-
+        const channel = await interaction.fetchReply();
         // Criar a thread a partir da mensagem de resposta
-        const thread = await message.startThread({
+        const thread = await channel.channel.threads.create({
           name: `${interaction.user.username} vs ${challengedUser.username}`,
           autoArchiveDuration: 1440, // 24 horas (1440 minutos)
           reason: "Tópico para separar as batalhas",
+          type: ChannelType.PrivateThread,
         });
-        console.log(`${thread.name} criado com sucesso!`);
-
+        await thread.members.add(discordID);
+        await thread.members.add(challengedUser.id);
+        await wait(1000);
+        collector.stop();
         activeInteractions.delete(discordID);
         // inicie o setup da batalha
         await BattleService.BattleSetup(user1, user2, thread, turnosQty);

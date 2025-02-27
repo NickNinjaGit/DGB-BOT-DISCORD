@@ -8,7 +8,7 @@ const PackageService = require("../services/PackageService");
 // helpers
 const checkSkillType = require("../helpers/checkSkillType");
 
-module.exports = class EmbedController {
+module.exports = class EmbedView {
   static async ShowUserProfile(discordId, displayImage) {
     const user = await User.findOne({ where: { discordID: discordId } });
     const cardCollection = await CardService.getUserCardsListed(discordId);
@@ -410,7 +410,7 @@ module.exports = class EmbedController {
       return embed;
   }
   
-  static getUpdatedEmbed(imageUrl, description) {
+  static async getUpdatedEmbed(imageUrl, description) {
     return new EmbedBuilder()
       .setTitle(description)
       .setImage(imageUrl)

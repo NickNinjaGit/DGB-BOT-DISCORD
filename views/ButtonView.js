@@ -32,29 +32,45 @@ module.exports = class ButtonController {
   }
   static async StardomButtons(starPoints) {
     const buttonConfigs = [
-        { min: 10, id: "stardom-bronze", label: "Mudar para Bronze", style: ButtonStyle.Success },
-        { min: 50, id: "stardom-silver", label: "Mudar para Prata", style: ButtonStyle.Success },
-        { min: 100, id: "stardom-gold", label: "Mudar para Ouro", style: ButtonStyle.Success },
-        { min: 200, id: "stardom-iridium", label: "Mudar para Ascendente", style: ButtonStyle.Success },
+      {
+        min: 10,
+        id: "stardom-bronze",
+        label: "Mudar para Bronze",
+        style: ButtonStyle.Success,
+      },
+      {
+        min: 50,
+        id: "stardom-silver",
+        label: "Mudar para Prata",
+        style: ButtonStyle.Success,
+      },
+      {
+        min: 100,
+        id: "stardom-gold",
+        label: "Mudar para Ouro",
+        style: ButtonStyle.Success,
+      },
+      {
+        min: 200,
+        id: "stardom-iridium",
+        label: "Mudar para Ascendente",
+        style: ButtonStyle.Success,
+      },
     ];
     const buttons = buttonConfigs
-    .filter(config => starPoints >= config.min)
-    .map(config =>
-      new ButtonBuilder()
-        .setCustomId(config.id)
-        .setLabel(config.label)
-        .setStyle(config.style)
-    );
+      .filter((config) => starPoints >= config.min)
+      .map((config) =>
+        new ButtonBuilder()
+          .setCustomId(config.id)
+          .setLabel(config.label)
+          .setStyle(config.style)
+      );
     const stardomRow = new ActionRowBuilder().addComponents(
-
       new ButtonBuilder()
         .setCustomId("stardom-default")
         .setLabel(`Mudar para o Padrão`)
         .setStyle(ButtonStyle.Success),
-        ...buttons   
-          
-        
-        
+      ...buttons
     );
     const quitRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
@@ -99,7 +115,7 @@ module.exports = class ButtonController {
     return navRow;
   }
   static async BattleButtons() {
-    const battleRow = new ActionRowBuilder().addComponents(
+    const actionRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("attack")
         .setLabel(`Atacar`)
@@ -109,24 +125,31 @@ module.exports = class ButtonController {
         .setLabel(`Defender`)
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
-        .setCustomId('dodge')
+        .setCustomId("dodge")
         .setLabel(`Esquivar`)
         .setStyle(ButtonStyle.Primary),
       new ButtonBuilder()
         .setCustomId("skillList")
         .setLabel(`Skills`)
         .setStyle(ButtonStyle.Success),
-    )
-    return battleRow;
-  }
-  static async ForfeitButton()
-  {
-    const forfeitRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("forfeit")
         .setLabel(`Desistir`)
         .setStyle(ButtonStyle.Secondary)
     );
-    return forfeitRow;
+    const confirmActionRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("confirm")
+        .setLabel("Confirmar Ação")
+        .setStyle(ButtonStyle.Success),
+    );
+    const cancelActionRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("cancel")
+        .setLabel("Cancelar Ação")
+        .setStyle(ButtonStyle.Danger)
+    );
+
+    return { actionRow, confirmActionRow, cancelActionRow };
   }
 };

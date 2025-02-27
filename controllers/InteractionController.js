@@ -1,9 +1,9 @@
 // interaction list
-const adminInteractions = require("./adminInteractions");
-const userInteractions = require("./userInteractions");
-const cardInteractions = require("./cardInteractions");
+const adminInteractions = require("../handlers/interaction/adminInteractions");
+const userInteractions = require("../handlers/interaction/userInteractions");
+const cardInteractions = require("../handlers/interaction/cardInteractions");
 // helpers
-const IsRegisteredUser = require("../../helpers/IsRegisteredUser");
+const IsRegisteredUser = require("../helpers/IsRegisteredUser");
 const wait = require("node:timers/promises").setTimeout;
 
 //active interactions

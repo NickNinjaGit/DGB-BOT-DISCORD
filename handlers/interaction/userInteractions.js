@@ -1,7 +1,7 @@
 // Controllers
-const EmbedController = require("../../controllers/EmbedController");
+const EmbedView = require("../../views/EmbedView");
 const CollectorController = require("../../controllers/CollectorController");
-const ButtonController = require("../../controllers/ButtonController");
+const ButtonView = require("../../views/ButtonView");
 // Services
 const CardService = require("../../services/CardService");
 const PackageService = require("../../services/PackageService");
@@ -35,11 +35,11 @@ async function myProfile(interaction, activeInteractions) {
     return;
   }
 
-  const myProfileEmbed = await EmbedController.ShowUserProfile(
+  const myProfileEmbed = await EmbedView.ShowUserProfile(
     discordID,
     userImage
   );
-  const profileButtons = await ButtonController.ProfileButtons();
+  const profileButtons = await ButtonView.ProfileButtons();
   await interaction.reply({
     embeds: [myProfileEmbed],
     components: [profileButtons],
@@ -95,7 +95,7 @@ async function friendProfile(interaction) {
     return;
   } else {
     // Se o amigo tiver conta, exibe o perfil
-    const friendProfileEmbed = await EmbedController.ShowUserProfile(
+    const friendProfileEmbed = await EmbedView.ShowUserProfile(
       selectedUser.id,
       selectedUser.displayAvatarURL()
     );
@@ -234,13 +234,13 @@ async function Shop(interaction, activeInteractions) {
   let packagesPerPage = await Pagination(pageId, ItensPerPage, packageList);
 
   // setting embed & buttons
-  let shopEmbed = await EmbedController.ShowShop(
+  let shopEmbed = await EmbedView.ShowShop(
     cardsPerPage,
     packagesPerPage,
     pageId,
     totalPages
   );
-  const shopButtons = await ButtonController.NavButtons();
+  const shopButtons = await ButtonView.NavButtons();
   await interaction.reply({
     embeds: [shopEmbed],
     components: [shopButtons],
@@ -268,7 +268,7 @@ async function Leaderboards(interaction) {
     raw: true,
   });
   // setting up embed
-  const leaderboardEmbed = await EmbedController.ShowLeaderboard(users);
+  const leaderboardEmbed = await EmbedView.ShowLeaderboard(users);
 
   await interaction.reply({
     embeds: [leaderboardEmbed],

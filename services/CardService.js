@@ -102,6 +102,13 @@ module.exports = class CardController {
       skill2: skill2 ? skill2.dataValues : null, // Inclui os campos da skill2 no objeto
     };
   }
+  static async saveUserCardChanges(userId, cardId, updatedData)
+  {
+    const userCard = await UserCards.findOne({ where: { userId, cardId } });
+
+    await userCard.update(updatedData);
+    await userCard.save();
+  }
   static async getAllCards() {
     const cards = await Card.findAll({
       order: [

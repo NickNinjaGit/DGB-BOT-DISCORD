@@ -19,7 +19,7 @@ module.exports = async function createCard(
     DEF,
     SPEED,
     SKILL1,
-    SKILL2
+    SKILL2,
 ) {
     try {
         // Calcula o hash da imagem
