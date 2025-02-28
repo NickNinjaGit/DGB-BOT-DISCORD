@@ -7,13 +7,14 @@ module.exports = async function checkAfkOrForfeit(
   user2,
   BattleOrder
 ) {
+  const timer = 5000;
   switch (action) {
     case "AfkAttacker":
       await thread.delete();
       const AfkAttackerMsg = await channel.send({
         content: `** ${BattleOrder.currentAttacker.name} ficou AFK por muito tempo. Vitória de ${BattleOrder.currentDefensor.name}!**`,
       });
-      await wait(3000);
+      await wait(timer);
       await AfkAttackerMsg.delete();
       return true;
 
@@ -22,7 +23,7 @@ module.exports = async function checkAfkOrForfeit(
       const AfkDefensorMsg = await channel.send({
         content: `**${BattleOrder.currentDefensor.name} ficou AFK por muito tempo. Vitória de ${BattleOrder.currentAttacker.name}!**`,
       });
-      await wait(3000);
+      await wait(timer);
       await AfkDefensorMsg.delete();
       return true;
 
@@ -32,7 +33,7 @@ module.exports = async function checkAfkOrForfeit(
       const AttackerForfeitMsg = await channel.send({
         content: `**Luta de ${user1.name} e ${user2.name} finalizada por desistência. Vitória de ${BattleOrder.currentDefensor.name}!**`,
       });
-      await wait(3000);
+      await wait(timer);
       await AttackerForfeitMsg.delete();
       return true;
 
@@ -42,7 +43,7 @@ module.exports = async function checkAfkOrForfeit(
       const DefensorForfeitMsg = await channel.send({
         content: `**Luta de ${user1.name} e ${user2.name} finalizada por desistência. Vitória de ${BattleOrder.currentAttacker.name}!**`,
       });
-      await wait(3000);
+      await wait(timer);
       await DefensorForfeitMsg.delete();
       return true;
   }
