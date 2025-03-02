@@ -152,4 +152,18 @@ module.exports = class ButtonController {
 
     return { actionRow, confirmActionRow, cancelActionRow };
   }
+  static async BattleSkillsButtons(skill1, skill2)
+  {
+    const skillListRow = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`skill1`)
+        .setLabel(`${skill1.name}`)
+        .setStyle(ButtonStyle.Success),
+      new ButtonBuilder()
+        .setCustomId(`skill2`)
+        .setLabel(`${skill2.name}`)
+        .setStyle(ButtonStyle.Success),
+    );
+    return skillListRow;
+  }
 };

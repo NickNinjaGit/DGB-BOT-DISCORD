@@ -1,6 +1,6 @@
 const CardService = require("../../services/CardService");
 
-module.exports = function resetAtributes(cardA, cardB) {
+module.exports = async function resetAtributes(cardA, cardB) {
     // reseting card A
     const updatedDataA = {
         currentHP: cardA.HP,

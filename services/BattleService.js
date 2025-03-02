@@ -6,19 +6,26 @@ const wait = require("node:timers/promises").setTimeout;
 const User = require("../models/User");
 
 // handlers
-const checkFirstTurnPlayer = require("../handlers/battle/checkFirstTurnPlayer");
+const checkFirstTurnPlayer = require("../handlers/battle/check-first-turn-player");
 const BattleActionCollector = require("../handlers/battle/battle-action-collector");
-const calculateDamage = require("../handlers/battle/calculateDamage");
-const checkAfkOrForfeit = require("../handlers/battle/checkAfkOrForfeit");
-const resetAtributes = require("../handlers/battle/resetAtributes");
+const calculateDamage = require("../handlers/battle/calculate-damage");
+const checkAfkOrForfeit = require("../handlers/battle/check-afk-or-forfeit");
+const resetAtributes = require("../handlers/battle/reset-atributes");
 
 module.exports = class BattleService {
-  static async BattleSetup(user1, user2, thread, turnosQty, battleCallUser, challengedUser) {
+  static async BattleSetup(
+    user1,
+    user2,
+    thread,
+    turnosQty,
+    battleCallUser,
+    challengedUser
+  ) {
     const getUserCardChoice = (user) => {
       return new Promise((resolve) => {
         const collector = thread.createMessageCollector({
           filter: (m) => m.author.id === user.discordID,
-          time: 5000, // 5 min para responder
+          time: 600000, // 5 min para responder
         });
 
         collector.on("collect", async (msg) => {
@@ -44,10 +51,16 @@ module.exports = class BattleService {
           }
         });
 
-        collector.on("end", () => {
-          battleCallUser.send("❌**A batalha foi cancelada pois uma das partes não escolheu sua carta.**❌")
-          challengedUser.send("❌**A batalha foi cancelada pois uma das partes não escolheu sua carta.**❌")
-          resolve(null);
+        collector.on("end", (reason) => {
+          if (reason === "time") {
+            battleCallUser.send(
+              "❌**A batalha foi cancelada pois uma das partes não escolheu sua carta.**❌"
+            );
+            challengedUser.send(
+              "❌**A batalha foi cancelada pois uma das partes não escolheu sua carta.**❌"
+            );
+            resolve(null);
+          }
         });
       });
     };
@@ -94,7 +107,7 @@ module.exports = class BattleService {
 */
     const messages = await thread.messages.fetch({ limit: 100 });
     await thread.bulkDelete(messages);
-
+    await resetAtributes(user1Card, user2Card);
     await this.BattleFlow(
       user1,
       user1Card,
@@ -133,9 +146,12 @@ module.exports = class BattleService {
           BattleOrder.currentAttacker,
           BattleOrder.currentDefensor.name,
           user1,
+          cardA,
+          cardB,
           cardEmbedA,
           cardEmbedB
         );
+        console.log("Ação esperada:", AttackerAction);
       const AttackerAFKorForfeit = await checkAfkOrForfeit(
         channel,
         thread,
@@ -150,11 +166,14 @@ module.exports = class BattleService {
         const winner = await User.findOne({
           where: { id: BattleOrder.currentAttacker.id },
         });
-        
+
         winner.wallet += forfeitCurrency;
         await winner.save();
-
         await resetAtributes(cardA, cardB);
+        user1.IsInBattle = false;
+        user2.IsInBattle = false;
+        user1.save();
+        user2.save();
         const moneyDefensorMsg = await channel.send({
           content: `**<@${BattleOrder.currentDefensor.discordID}> recebeu ${forfeitCurrency} moedas pela vitória.**`,
         });
@@ -168,13 +187,15 @@ module.exports = class BattleService {
           BattleOrder.currentDefensor,
           BattleOrder.currentAttacker.name,
           user1,
+          cardA,
+          cardB,
           cardEmbedA,
           cardEmbedB
         );
       const DefensorAFKorForfeit = await checkAfkOrForfeit(
         channel,
         thread,
-        AttackerAction,
+        DefensorAction,
         user1,
         user2,
         BattleOrder
@@ -185,11 +206,15 @@ module.exports = class BattleService {
         const winner = await User.findOne({
           where: { id: BattleOrder.currentDefensor.id },
         });
-        
+
         winner.wallet += forfeitCurrency;
         await winner.save();
 
         await resetAtributes(cardA, cardB);
+        user1.IsInBattle = false;
+        user2.IsInBattle = false;
+        user1.save();
+        user2.save();
         const moneyAttackerMsg = await channel.send({
           content: `**<@${BattleOrder.currentAttacker.discordID}> recebeu ${forfeitCurrency} moedas pela vitória.**`,
         });
@@ -202,11 +227,13 @@ module.exports = class BattleService {
         AttackerAction,
         DefensorAction,
         BattleOrder.currentAttacker,
+        BattleOrder.currentAttackerCard,
         BattleOrder.currentDefensor,
+        BattleOrder.currentDefensorCard,
         cardA,
         cardB
       );
-      // Atualiza os valores do banco
+      // pega os dados atualizados no banco
       cardA = await CardService.getUserCardByName(
         BattleOrder.currentAttacker,
         cardA.name
@@ -230,10 +257,9 @@ module.exports = class BattleService {
         content: `-----------------------------------`,
       });
       // determinar o vencedor se chegar no fim da batalha
-      if(cardA.currentHP <= 0 || cardB.currentHP <= 0){
+      if (cardA.currentHP <= 0 || cardB.currentHP <= 0) {
         console.log("Vitória por HP");
-      }
-      else if (turns === turnosQty) {
+      } else if (turns === turnosQty) {
         console.log("Vitória por TURNOS");
       }
       turns++;
@@ -243,52 +269,134 @@ module.exports = class BattleService {
     AttackerAction,
     DefensorAction,
     currentAttacker,
+    currentAttackerCard,
     currentDefensor,
+    currentDefensorCard,
     cardA,
     cardB
   ) {
     /* Casos de ataque vindo de user1 */
     let response = null;
-    const actionKey = `${AttackerAction}-${DefensorAction}`;
 
-    switch (actionKey) {
-      // ATACK A VS ATACK B
-      case "attack-attack":
-        const damageA = await calculateDamage.ApplyDamage(cardA.currentATK);
-        const damageB = await calculateDamage.ApplyDamage(cardB.currentATK);
-        cardA.currentHP -= damageB;
-        cardB.currentHP -= damageA;
-        await CardService.saveUserCardChanges(
-          currentAttacker.id,
-          cardA.cardId,
-          { currentHP: cardA.currentHP }
-        );
-        await CardService.saveUserCardChanges(
-          currentDefensor.id,
-          cardB.cardId,
-          { currentHP: cardB.currentHP }
-        );
+    // ATACK A VS ATACK B vice versa
+    if (AttackerAction === "attack" && DefensorAction === "attack") {
+      const damageA = await calculateDamage.ApplyDamage(cardA.currentATK);
+      const damageB = await calculateDamage.ApplyDamage(cardB.currentATK);
+      cardA.currentHP -= damageB;
+      cardB.currentHP -= damageA;
+      await CardService.saveUserCardChanges(currentAttacker.id, cardA.cardId, {
+        currentHP: cardA.currentHP,
+      });
+      await CardService.saveUserCardChanges(currentDefensor.id, cardB.cardId, {
+        currentHP: cardB.currentHP,
+      });
 
-        response = `**🗡️Os dois atacaram, ${cardA.name} (${currentAttacker.name}) tomou ${damageA} de dano e ${cardB.name} (${currentDefensor.name}) tomou ${damageB} de dano.** 🗡️ `;
+      response = `**🗡️Os dois atacaram, ${cardA.name} (${currentAttacker.name}) tomou ${damageA} de dano e ${cardB.name} (${currentDefensor.name}) tomou ${damageB} de dano.** 🗡️ `;
+      return response;
+    }
+    // ATACK A VS DEFENSE B
+    if (AttackerAction === "attack" && DefensorAction === "defend") {
+      const damageA = await calculateDamage.ApplyDamage(
+        currentAttackerCard.currentATK
+      );
+      const reducedDamageB = await calculateDamage.Defend(
+        currentDefensorCard.currentDEF,
+        damageA
+      );
+      currentDefensorCard.currentHP -= reducedDamageB;
+
+      await CardService.saveUserCardChanges(
+        currentDefensor.id,
+        currentDefensorCard.cardId,
+        {
+          currentHP: currentDefensorCard.currentHP,
+        }
+      );
+
+      response = `**🛡️${currentDefensorCard.name} (${currentDefensor.name}) defendeu o ataque, tomando ${reducedDamageB} de dano.** 🛡️ `;
+      console.log("Respota", response);
+      return response;
+    }
+    // ATACK A VS DODGE B
+    if (AttackerAction === "attack" && DefensorAction === "dodge") {
+      const damageA = await calculateDamage.ApplyDamage(
+        currentAttackerCard.currentATK
+      );
+      const dodgedDamageB = await calculateDamage.Dodge(
+        currentDefensorCard.currentSPEED,
+        damageA
+      );
+      currentDefensorCard.currentHP -= dodgedDamageB;
+
+      await CardService.saveUserCardChanges(
+        currentDefensor.id,
+        currentDefensorCard.cardId,
+        {
+          currentHP: currentDefensorCard.currentHP,
+        }
+      );
+
+      if (dodgedDamageB === 0) {
+        response = `🏃**${currentDefensorCard.name} (${currentDefensor.name}) esquivou do ataque, anulando completamente o dano!**🏃`;
         return response;
+      } else {
+        response = `💥**${currentDefensorCard.name} (${currentDefensor.name}) falhou em esquivar do ataque tomando o dobro de dano. (dano: ${dodgedDamageB})**💥`;
+        return response;
+      }
     }
 
-    // ATACK A VS DEFENSE B
-    // ATACK A VS DODGE Br
-
     /* Casos de ataque vindo de user2 */
-    // ATACK B VS ATACK A
     // ATACK B VS DEFENSE A
+    if (AttackerAction === "defend" && DefensorAction === "attack") {
+      const damageB = await calculateDamage.ApplyDamage(
+        currentDefensorCard.currentATK
+      );
+      const reducedDamageA = await calculateDamage.Defend(
+        currentAttackerCard.currentDEF,
+        damageB
+      );
+      currentAttackerCard.currentHP -= reducedDamageA;
+
+      await CardService.saveUserCardChanges(
+        currentAttacker.id,
+        currentAttackerCard.cardId,
+        {
+          currentHP: currentAttackerCard.currentHP,
+        }
+      );
+
+      response = `**🛡️${currentAttackerCard.name} (${currentAttacker.name}) previu o ataque de ${currentDefensorCard.name} (${currentDefensor.name}), recebendo ${reducedDamageA} de dano.** 🛡️ `;
+      console.log("Respota", response);
+      return response;
+    }
+
     // ATACK B VS DODGE A
+    if (AttackerAction === "dodge" && DefensorAction === "attack") {
+      const damageB = await calculateDamage.ApplyDamage(
+        currentDefensorCard.currentATK
+      );
+      const dodgedDamageA = await calculateDamage.Dodge(
+        currentAttackerCard.currentSPEED,
+        damageB
+      );
+      currentDefensorCard.currentHP -= dodgedDamageA;
 
-    /* Casos de previsão de ataque vindo de user1 */
-    // DEFENSE A VS ATACK B
-    // DODGE A VS ATACK B
+      await CardService.saveUserCardChanges(
+        currentAttacker.id,
+        currentAttackerCard.cardId,
+        {
+          currentHP: currentAttackerCard.currentHP,
+        }
+      );
 
-    /* Casos de previsão de ataque vindo de user2 */
-    // DEFENSE B VS ATACK A
-    // DODGE B VS ATACK A
-
+      if (dodgedDamageA === 0) {
+        response = `🏃**${currentAttackerCard.name} (${currentAttacker.name}) preveu uma esquiva, anulando completamente o dano!**🏃`;
+        return response;
+      } else {
+        response = `💥**${currentAttackerCard.name} (${currentAttacker.name}) falhou em esquivar do ataque tomando o dobro de dano. (dano: ${dodgedDamageA})**💥`;
+        return response;
+      }
+    }
     /* Casos de nada acontecer */
     // DEFENSE A VS DEFENSE B
     // DEFESNE A VS DODGE B
@@ -299,5 +407,14 @@ module.exports = class BattleService {
     // DEFENSE B VS DODGE A
     // DODGE B VS DEFENSE A
     // DODGE B VS DODGE A
+    if (
+      (AttackerAction === "defend" && DefensorAction === "dodge") ||
+      (AttackerAction === "dodge" && DefensorAction === "defend") ||
+      (AttackerAction === "dodge" && DefensorAction === "dodge") ||
+      (AttackerAction === "defend" && DefensorAction === "defend")
+    ) {
+      response = `**🤡${currentAttacker.name} e ${currentDefensor.name} tentaram esquivar ou defender ao mesmo tempo, então nada aconteceu!🤡**`;
+      return response;
+    }
   }
 };

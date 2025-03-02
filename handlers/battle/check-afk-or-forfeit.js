@@ -7,12 +7,12 @@ module.exports = async function checkAfkOrForfeit(
   user2,
   BattleOrder
 ) {
-  const timer = 5000;
+  const timer = 15000;
   switch (action) {
     case "AfkAttacker":
       await thread.delete();
       const AfkAttackerMsg = await channel.send({
-        content: `** ${BattleOrder.currentAttacker.name} ficou AFK por muito tempo. Vitória de ${BattleOrder.currentDefensor.name}!**`,
+        content: `** <@${BattleOrder.currentAttacker.discordID}> ficou AFK por muito tempo. Vitória de <@${BattleOrder.currentDefensor.discordID}>!**`,
       });
       await wait(timer);
       await AfkAttackerMsg.delete();
@@ -21,7 +21,7 @@ module.exports = async function checkAfkOrForfeit(
     case "AfkDefensor":
       await thread.delete();
       const AfkDefensorMsg = await channel.send({
-        content: `**${BattleOrder.currentDefensor.name} ficou AFK por muito tempo. Vitória de ${BattleOrder.currentAttacker.name}!**`,
+        content: `**<@${BattleOrder.currentDefensor.discordID}> ficou AFK por muito tempo. Vitória de <@${BattleOrder.currentAttacker.discordID}>!**`,
       });
       await wait(timer);
       await AfkDefensorMsg.delete();
@@ -31,7 +31,7 @@ module.exports = async function checkAfkOrForfeit(
     case BattleOrder.currentAttacker.name:
       await thread.delete();
       const AttackerForfeitMsg = await channel.send({
-        content: `**Luta de ${user1.name} e ${user2.name} finalizada por desistência. Vitória de ${BattleOrder.currentDefensor.name}!**`,
+        content: `**Luta de ${user1.name} e ${user2.name} finalizada por desistência. Vitória de <@${BattleOrder.currentDefensor.discordID}>!**`,
       });
       await wait(timer);
       await AttackerForfeitMsg.delete();
@@ -41,7 +41,7 @@ module.exports = async function checkAfkOrForfeit(
     case BattleOrder.currentDefensor.name:
       await thread.delete();
       const DefensorForfeitMsg = await channel.send({
-        content: `**Luta de ${user1.name} e ${user2.name} finalizada por desistência. Vitória de ${BattleOrder.currentAttacker.name}!**`,
+        content: `**Luta de ${user1.name} e ${user2.name} finalizada por desistência. Vitória de <@${BattleOrder.currentAttacker.discordID}>!**`,
       });
       await wait(timer);
       await DefensorForfeitMsg.delete();
