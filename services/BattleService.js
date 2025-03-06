@@ -378,7 +378,7 @@ module.exports = class BattleService {
         currentAttackerCard.currentSPEED,
         damageB
       );
-      currentDefensorCard.currentHP -= dodgedDamageA;
+      currentAttackerCard.currentHP -= dodgedDamageA;
 
       await CardService.saveUserCardChanges(
         currentAttacker.id,
