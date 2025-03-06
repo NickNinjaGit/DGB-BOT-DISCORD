@@ -289,6 +289,7 @@ async function StartBattle(interaction, activeInteractions) {
     await interaction.deleteReply();
     return;
 }
+  
 
   if (userHasCards.length === 0) {
     await interaction.reply({
@@ -352,6 +353,17 @@ async function StartBattle(interaction, activeInteractions) {
   if (challengedUserOnBattle.IsInBattle === true) {
     await interaction.reply({
       content: "**O usuário selecionado já esta em uma batalha!**",
+    });
+    await wait(2000);
+    await interaction.deleteReply();
+    return;
+  }
+
+  // check if turns are on minimum value
+  if (turnosQty < 10)
+  {
+    await interaction.reply({
+      content: "**A batalha precisa de um mínino de 10 turnos.**",
     });
     await wait(2000);
     await interaction.deleteReply();

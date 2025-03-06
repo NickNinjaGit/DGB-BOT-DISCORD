@@ -5,6 +5,8 @@ async function BattleAttackerCollector(
   currentAttacker,
   defensorName,
   user1,
+  cardA,
+  cardB,
   cardEmbedA,
   cardEmbedB
 ) {
@@ -15,6 +17,9 @@ async function BattleAttackerCollector(
     ? (attackerEmbed = cardEmbedA)
     : (attackerEmbed = cardEmbedB);
 
+  let currentCard = undefined;
+  currentAttacker === user1 ? (currentCard = cardA) : (currentCard = cardB);
+
   return new Promise((resolve) => {
     const collector = thread.createMessageComponentCollector({
       filter: (i) => i.user.id === currentAttacker.discordID,
@@ -23,7 +28,10 @@ async function BattleAttackerCollector(
     let choosedAction = null;
     let alreadyCanceled = false;
     let confirmed = false;
+    let lastMessageId = null;
+
     collector.on("collect", async (interaction) => {
+      let interactionID = interaction.message.id;
       if (
         !interaction.customId.startsWith("confirm") &&
         !interaction.customId.startsWith("cancel")
@@ -36,9 +44,38 @@ async function BattleAttackerCollector(
         return;
       }
       const battleButtons = await ButtonView.BattleButtons();
+      const skillsButtons = await ButtonView.BattleSkillsButtons(
+        currentCard.skill1,
+        currentCard.skill2
+      );
       const confirmButton = battleButtons.confirmActionRow;
       const cancelButton = battleButtons.cancelActionRow;
+
       //chamar botão de confimação
+      if (interaction.customId === "skillList") {
+        const newMessage = await interaction.update({
+          content: `# Skills:`,
+          embeds: [attackerEmbed],
+          components: [skillsButtons],
+          fetchReply: true,
+        });
+        lastMessageId = newMessage.id;
+        const skillCollector = thread.createMessageComponentCollector({
+          filter: (i) => i.user.id === currentAttacker.discordID,
+          time: collectorTimer, // 10 min para responder
+        });
+
+        skillCollector.on("collect", async (i) => {
+          if (i.customId === "skill1" || i.customId === "skill2") {
+            choosedAction = i.customId;
+            skillCollector.stop();
+          }
+        });
+        return;
+      }
+      
+      lastMessageId = interaction.message.id;
+
       if (confirmed) {
         await interaction.update({
           content: `# Ação confirmada!`,
@@ -53,14 +90,18 @@ async function BattleAttackerCollector(
           embeds: [attackerEmbed],
           components: [confirmButton],
         });
-      } else {
+        return;
+      }
+      else
+      {
         await interaction.update({
           content: `# Deseja confimar ação?`,
           embeds: [attackerEmbed],
           components: [confirmButton, cancelButton],
         });
       }
-      let interactionID = interaction.message.id;
+     
+
       // criar uma função para lidar com a confirmação
       const confirmCollector = thread.createMessageComponentCollector({
         filter: (i) => i.user.id === currentAttacker.discordID,
@@ -73,9 +114,9 @@ async function BattleAttackerCollector(
           confirmCollector.stop();
           collector.stop();
           alreadyCanceled = false;
+          alreadyBack = false;
           confirmed = true;
         } else if (i.customId === "cancel") {
-          console.log(interaction);
           // get interaction by id
           await thread.messages
             .fetch(interactionID, { force: true })
@@ -106,6 +147,8 @@ async function BattleDefensorCollector(
   currentDefender,
   attackerName,
   user1,
+  cardA,
+  cardB,
   cardEmbedA,
   cardEmbedB
 ) {
@@ -113,6 +156,11 @@ async function BattleDefensorCollector(
   currentDefender === user1
     ? (defensorEmbed = cardEmbedA)
     : (defensorEmbed = cardEmbedB);
+
+    
+  let currentCard = undefined;
+  currentDefender === user1 ? (currentCard = cardA) : (currentCard = cardB);
+
   battleButtons = await ButtonView.BattleButtons();
   await thread.send({
     content: `---------------------------------------`,
@@ -136,6 +184,7 @@ async function BattleDefensorCollector(
     let choosedAction = null;
     let alreadyCanceled = false;
     let confirmed = false;
+    let lastMessageId = null;
     collector.on("collect", async (interaction) => {
       if (
         !interaction.customId.startsWith("confirm") &&
@@ -148,9 +197,40 @@ async function BattleDefensorCollector(
         resolve(attackerName);
         return;
       }
+      
       const battleButtons = await ButtonView.BattleButtons();
       const confirmButton = battleButtons.confirmActionRow;
       const cancelButton = battleButtons.cancelActionRow;
+      const skillsButtons = await ButtonView.BattleSkillsButtons(
+        currentCard.skill1,
+        currentCard.skill2
+      );
+     
+
+      //chamar botão de confimação
+      if (interaction.customId === "skillList") {
+        const newMessage = await interaction.update({
+          content: `# Skills:`,
+          embeds: [defensorEmbed],
+          components: [skillsButtons],
+          fetchReply: true,
+        });
+        lastMessageId = newMessage.id;
+        const skillCollector = thread.createMessageComponentCollector({
+          filter: (i) => i.user.id === currentDefender.discordID,
+          time: collectorTimer, // 10 min para responder
+        });
+
+        skillCollector.on("collect", async (i) => {
+          if (i.customId === "skill1" || i.customId === "skill2") {
+            choosedAction = i.customId;
+            skillCollector.stop();
+          }
+        });
+        return;
+      }
+      
+      lastMessageId = interaction.message.id;
       //chamar botão de confimação
       if (confirmed) {
         await interaction.update({
@@ -173,7 +253,6 @@ async function BattleDefensorCollector(
           embeds: [defensorEmbed],
           components: [confirmButton],
         });
-        return;
       } else {
         await interaction.update({
           content: `# Deseja confimar ação?`,

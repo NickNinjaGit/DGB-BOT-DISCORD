@@ -452,10 +452,10 @@ module.exports = class CollectorController {
         const user2 = await User.findOne({
           where: { discordID: challengedUser.id },
         });
-        //user1.IsInBattle = true;
-        //user2.IsInBattle = true;
-        //await user1.save();
-        //await user2.save();
+        user1.IsInBattle = true;
+        user2.IsInBattle = true;
+        await user1.save();
+        await user2.save();
         const hostUser = interaction.user
         const channel = await interaction.fetchReply();
         // Criar a thread a partir da mensagem de resposta

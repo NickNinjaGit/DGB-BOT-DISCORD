@@ -25,11 +25,23 @@ async function Defend(DEF, Damage) {
     const damageReductionFactor = DEF / (Damage + DEF);
     const Defense = Damage * (1 - damageReductionFactor);
 
-    // Se a defesa for muito forte, o defensor pode "recuperar" um pouco do dano perdido
+    // Se a defesa for muito forte, o atacante pode "recuperar" um pouco do dano perdido
     if (Defense >= Damage) {
         Defense += Defense / 2;
     }
     return Defense.toFixed(0);
 }
 
-module.exports = { ApplyDamage, Defend };
+async function Dodge(SPEED, Damage)
+{
+    const dodgeRoll = Math.floor(SPEED);
+    const dodgeChance = dodgeRoll >= 100 ? Math.floor(Math.random() * 1000) : Math.floor(Math.random() * 100);
+    if (dodgeRoll < dodgeChance) {
+        return Damage * 2;
+    }
+    Damage = 0;
+    return Damage;
+}
+
+
+module.exports = { ApplyDamage, Defend, Dodge };
