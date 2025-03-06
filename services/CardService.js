@@ -96,6 +96,9 @@ module.exports = class CardController {
       description: card.description,
       HP: card.HP,
       MANA: card.MANA,
+      ATK: card.ATK,
+      DEF: card.DEF,
+      SPEED: card.SPEED,
       ...userCard.dataValues, // Inclui os campos do card no objeto
       rarity: rarity_info,
       skill1: skill1 ? skill1.dataValues : null, // Inclui os campos da skill1 no objeto

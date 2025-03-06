@@ -3,21 +3,22 @@ const EmbedView = require("../views/EmbedView");
 const CardService = require("./CardService");
 const wait = require("node:timers/promises").setTimeout;
 
-// helpers
-const checkFirstTurnPlayer = require("../helpers/checkFirstTurnPlayer");
-const BattleActionCollector = require("../handlers/battle-action-collector");
-const calculateDamage = require("../helpers/calculateDamage");
-const checkAfkOrForfeit = require("../helpers/checkAfkOrForfeit");
+const User = require("../models/User");
+
+// handlers
+const checkFirstTurnPlayer = require("../handlers/battle/checkFirstTurnPlayer");
+const BattleActionCollector = require("../handlers/battle/battle-action-collector");
+const calculateDamage = require("../handlers/battle/calculateDamage");
+const checkAfkOrForfeit = require("../handlers/battle/checkAfkOrForfeit");
+const resetAtributes = require("../handlers/battle/resetAtributes");
 
 module.exports = class BattleService {
-  static async BattleSetup(user1, user2, thread, turnosQty) {
-    // TODO
-    // ENVIAR UMA MENSAGEM PEDINDO AO USUARIO 1 DIGITAR A CARTA QUE DESEJA USAR
+  static async BattleSetup(user1, user2, thread, turnosQty, battleCallUser, challengedUser) {
     const getUserCardChoice = (user) => {
       return new Promise((resolve) => {
         const collector = thread.createMessageCollector({
           filter: (m) => m.author.id === user.discordID,
-          time: 300000, // 5 min para responder
+          time: 5000, // 5 min para responder
         });
 
         collector.on("collect", async (msg) => {
@@ -44,6 +45,8 @@ module.exports = class BattleService {
         });
 
         collector.on("end", () => {
+          battleCallUser.send("❌**A batalha foi cancelada pois uma das partes não escolheu sua carta.**❌")
+          challengedUser.send("❌**A batalha foi cancelada pois uma das partes não escolheu sua carta.**❌")
           resolve(null);
         });
       });
@@ -52,11 +55,13 @@ module.exports = class BattleService {
       content: `⬆️<@${user1.discordID}> escolha a sua carta.⬆️`,
     });
     let user1Card = await getUserCardChoice(user1);
+    if (user1Card === null) return;
     user1Message.delete();
     await thread.send({
       content: `⬆️<@${user2.discordID}> escolha a sua carta.⬆️`,
     });
     let user2Card = await getUserCardChoice(user2);
+    if (user2Card === null) return;
 
     const userCardEmbed1 = await EmbedView.ShowBattleCard(user1Card);
     const userCardEmbed2 = await EmbedView.ShowBattleCard(user2Card);
@@ -122,33 +127,77 @@ module.exports = class BattleService {
         battleButtons,
         thread
       );
-      const AttackerAction = await BattleActionCollector.BattleAttackerCollector(
+      const AttackerAction =
+        await BattleActionCollector.BattleAttackerCollector(
+          thread,
+          BattleOrder.currentAttacker,
+          BattleOrder.currentDefensor.name,
+          user1,
+          cardEmbedA,
+          cardEmbedB
+        );
+      const AttackerAFKorForfeit = await checkAfkOrForfeit(
+        channel,
         thread,
-        BattleOrder.currentAttacker,
-        BattleOrder.currentDefensor.name,
+        AttackerAction,
         user1,
-        cardEmbedA,
-        cardEmbedB
+        user2,
+        BattleOrder
       );
-      const AttackerAFKorForfeit = await checkAfkOrForfeit(channel, thread, AttackerAction, user1, user2, BattleOrder)
-      if(AttackerAFKorForfeit)
-      {
+      if (AttackerAFKorForfeit) {
+        turns === 0 ? (turns = 1) : (turns += 1);
+        const forfeitCurrency = turns * 10;
+        const winner = await User.findOne({
+          where: { id: BattleOrder.currentAttacker.id },
+        });
+        
+        winner.wallet += forfeitCurrency;
+        await winner.save();
+
+        await resetAtributes(cardA, cardB);
+        const moneyDefensorMsg = await channel.send({
+          content: `**<@${BattleOrder.currentDefensor.discordID}> recebeu ${forfeitCurrency} moedas pela vitória.**`,
+        });
+        await wait(10000);
+        await moneyDefensorMsg.delete();
         break;
       }
-      const DefensorAction = await BattleActionCollector.BattleDefensorCollector(
+      const DefensorAction =
+        await BattleActionCollector.BattleDefensorCollector(
+          thread,
+          BattleOrder.currentDefensor,
+          BattleOrder.currentAttacker.name,
+          user1,
+          cardEmbedA,
+          cardEmbedB
+        );
+      const DefensorAFKorForfeit = await checkAfkOrForfeit(
+        channel,
         thread,
-        BattleOrder.currentDefensor,
-        BattleOrder.currentAttacker.name,
+        AttackerAction,
         user1,
-        cardEmbedA,
-        cardEmbedB
+        user2,
+        BattleOrder
       );
-      const DefensorAFKorForfeit = await checkAfkOrForfeit(channel, thread, AttackerAction, user1, user2, BattleOrder)
-      if(DefensorAFKorForfeit)
-      {
+      if (DefensorAFKorForfeit) {
+        turns === 0 ? (turns = 1) : (turns += 1);
+        const forfeitCurrency = turns * 10;
+        const winner = await User.findOne({
+          where: { id: BattleOrder.currentDefensor.id },
+        });
+        
+        winner.wallet += forfeitCurrency;
+        await winner.save();
+
+        await resetAtributes(cardA, cardB);
+        const moneyAttackerMsg = await channel.send({
+          content: `**<@${BattleOrder.currentAttacker.discordID}> recebeu ${forfeitCurrency} moedas pela vitória.**`,
+        });
+        await wait(10000);
+        await moneyAttackerMsg.delete();
         break;
       }
-      
+
       const ActionResponse = await this.BattleActionHandler(
         AttackerAction,
         DefensorAction,
@@ -167,8 +216,6 @@ module.exports = class BattleService {
         cardB.name
       );
 
-      console.log(cardA);
-
       // Gera novas embeds com os valores atualizados
       cardEmbedA = await EmbedView.ShowBattleCard(cardA);
       cardEmbedB = await EmbedView.ShowBattleCard(cardB);
@@ -182,6 +229,13 @@ module.exports = class BattleService {
       await thread.send({
         content: `-----------------------------------`,
       });
+      // determinar o vencedor se chegar no fim da batalha
+      if(cardA.currentHP <= 0 || cardB.currentHP <= 0){
+        console.log("Vitória por HP");
+      }
+      else if (turns === turnosQty) {
+        console.log("Vitória por TURNOS");
+      }
       turns++;
     }
   }
@@ -220,7 +274,7 @@ module.exports = class BattleService {
     }
 
     // ATACK A VS DEFENSE B
-    // ATACK A VS DODGE B
+    // ATACK A VS DODGE Br
 
     /* Casos de ataque vindo de user2 */
     // ATACK B VS ATACK A

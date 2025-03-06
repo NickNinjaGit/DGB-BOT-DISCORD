@@ -456,10 +456,11 @@ module.exports = class CollectorController {
         //user2.IsInBattle = true;
         //await user1.save();
         //await user2.save();
+        const hostUser = interaction.user
         const channel = await interaction.fetchReply();
         // Criar a thread a partir da mensagem de resposta
         const thread = await channel.channel.threads.create({
-          name: `${interaction.user.username} vs ${challengedUser.username}`,
+          name: `${hostUser.username} vs ${challengedUser.username}`,
           autoArchiveDuration: 1440, // 24 horas (1440 minutos)
           reason: "Tópico para separar as batalhas",
           type: ChannelType.PrivateThread,
@@ -470,7 +471,7 @@ module.exports = class CollectorController {
         collector.stop();
         activeInteractions.delete(discordID);
         // inicie o setup da batalha
-        await BattleService.BattleSetup(user1, user2, thread, turnosQty);
+        await BattleService.BattleSetup(user1, user2, thread, turnosQty, hostUser, challengedUser);
         await wait(3000);
         return;
       } else if (reaction.emoji.name === "👎") {

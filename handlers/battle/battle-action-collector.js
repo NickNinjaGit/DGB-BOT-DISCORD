@@ -1,4 +1,4 @@
-const ButtonView = require("../views/ButtonView");
+const ButtonView = require("../../views/ButtonView");
 const collectorTimer = 600000;
 async function BattleAttackerCollector(
   thread,
