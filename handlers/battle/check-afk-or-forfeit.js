@@ -1,3 +1,4 @@
+
 const wait = require("node:timers/promises").setTimeout;
 module.exports = async function checkAfkOrForfeit(
   channel,
@@ -8,7 +9,7 @@ module.exports = async function checkAfkOrForfeit(
   BattleOrder
 ) {
 
-  const timer = 15000;
+  const timer = 5000;
   switch (action) {
     case "AfkAttacker":
       await thread.delete();

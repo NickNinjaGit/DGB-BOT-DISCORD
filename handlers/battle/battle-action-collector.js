@@ -253,6 +253,7 @@ async function BattleDefensorCollector(
           embeds: [defensorEmbed],
           components: [confirmButton],
         });
+        return;
       } else {
         await interaction.update({
           content: `# Deseja confimar ação?`,
