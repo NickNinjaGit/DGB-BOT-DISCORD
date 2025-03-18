@@ -1,4 +1,6 @@
 const CardService = require("../../services/CardService");
+const ButtonView = require("../../views/ButtonView");
+const skillRenderHandler = require("./skill-render-handler");
 
 module.exports = async function checkFirstTurnPlayer(
   cardA,
@@ -23,16 +25,32 @@ module.exports = async function checkFirstTurnPlayer(
         user1,
         cardA.name
       );
+      const skillsButtons = await ButtonView.BattleSkillsButtons(
+        cardA.skill1,
+        cardA.skill2
+      );
       const currentDefensor = user2;
       const currentDefensorCard = await CardService.getUserCardByName(
         user2,
         cardB.name
       );
-      await thread.send({
-        embeds: [cardEmbedA],
-        components: [battleButtons.actionRow],
-      });
-
+      // check if player has mana to use skill
+      const attackerManaStatus = cardA.currentMANA;
+      const checkManaStatus = await skillRenderHandler.checkManaStatus(
+        attackerManaStatus,
+        cardA.skill1,
+        cardA.skill2
+      );
+      const SkillButtonRender = await skillRenderHandler.SkillButtonRender(
+        checkManaStatus,
+        skillsButtons
+      );
+      await skillRenderHandler.AttackerSkillButtonResolve(
+        SkillButtonRender,
+        thread,
+        cardEmbedA,
+        battleButtons
+      );
       await thread.send({
         content: `# Turno ${turns + 1} de ${turnosQty}, vez de ${user1.name}`,
       });
@@ -55,18 +73,33 @@ module.exports = async function checkFirstTurnPlayer(
       const currentAttacker = user2;
       const currentAttackerCard = await CardService.getUserCardByName(
         user2,
-        cardA.name
+        cardB.name
+      );
+      const skillsButtons = await ButtonView.BattleSkillsButtons(
+        cardB.skill1,
+        cardB.skill2
       );
       const currentDefensor = user1;
       const currentDefensorCard = await CardService.getUserCardByName(
         user1,
-        cardB.name
+        cardA.name
       );
-      await thread.send({
-        embeds: [cardEmbedB],
-        components: [battleButtons.actionRow],
-      });
-
+      const attackerManaStatus = cardB.currentMANA;
+      const checkManaStatus = await skillRenderHandler.checkManaStatus(
+        attackerManaStatus,
+        cardB.skill1,
+        cardB.skill2
+      );
+      const SkillButtonRender = await skillRenderHandler.SkillButtonRender(
+        checkManaStatus,
+        skillsButtons
+      );
+      await skillRenderHandler.AttackerSkillButtonResolve(
+        SkillButtonRender,
+        thread,
+        cardEmbedB,
+        battleButtons
+      );
       await thread.send({
         content: `# Turno ${turns + 1} de ${turnosQty}, vez de ${user2.name}`,
       });
@@ -92,15 +125,31 @@ module.exports = async function checkFirstTurnPlayer(
         user1,
         cardA.name
       );
+      const skillsButtons = await ButtonView.BattleSkillsButtons(
+        cardA.skill1,
+        cardA.skill2
+      );
       const currentDefensor = user2;
       const currentDefensorCard = await CardService.getUserCardByName(
         user2,
         cardB.name
       );
-      await thread.send({
-        embeds: [cardEmbedA],
-        components: [battleButtons.actionRow],
-      });
+      const attackerManaStatus = cardA.currentMANA;
+      const checkManaStatus = await skillRenderHandler.checkManaStatus(
+        attackerManaStatus,
+        cardA.skill1,
+        cardA.skill2
+      );
+      const SkillButtonRender = await skillRenderHandler.SkillButtonRender(
+        checkManaStatus,
+        skillsButtons
+      );
+      await skillRenderHandler.AttackerSkillButtonResolve(
+        SkillButtonRender,
+        thread,
+        cardEmbedA,
+        battleButtons
+      );
       await thread.send({
         content: `💨**${cardA.name} possui maior velocidade.**💨`,
       });
@@ -125,10 +174,26 @@ module.exports = async function checkFirstTurnPlayer(
         user1,
         cardA.name
       );
-      await thread.send({
-        embeds: [cardEmbedB],
-        components: [battleButtons.actionRow],
-      });
+      const skillsButtons = await ButtonView.BattleSkillsButtons(
+        cardB.skill1,
+        cardB.skill2
+      );
+      const attackerManaStatus = cardB.currentMANA;
+      const checkManaStatus = await skillRenderHandler.checkManaStatus(
+        attackerManaStatus,
+        cardB.skill1,
+        cardB.skill2
+      );
+      const SkillButtonRender = await skillRenderHandler.SkillButtonRender(
+        checkManaStatus,
+        skillsButtons
+      );
+      await skillRenderHandler.AttackerSkillButtonResolve(
+        SkillButtonRender,
+        thread,
+        cardEmbedB,
+        battleButtons
+      );
       await thread.send({
         content: `💨**${user2.name} possui maior velocidade.**💨`,
       });

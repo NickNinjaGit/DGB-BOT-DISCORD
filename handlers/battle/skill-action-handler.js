@@ -8,6 +8,7 @@ module.exports = async function SkillActionHandler(AttackerAction, DefensorActio
     // get skill info
     const AttackerSkill = await SkillService.getCurrentSkill(AttackerAction, currentAttackerCard);
     const DefensorSkill = await SkillService.getCurrentSkill(DefensorAction, currentDefensorCard);
+    console.log(DefensorSkill);
 
     // SKILL-DAMAGE A VS ATK B 
     if(AttackerSkill.SkillType === "DAMAGE" && DefensorAction === "attack") {

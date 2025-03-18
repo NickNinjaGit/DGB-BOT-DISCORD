@@ -1,4 +1,5 @@
 const ButtonView = require("../../views/ButtonView");
+const skillRenderHandler = require("./skill-render-handler");
 const collectorTimer = 600000;
 async function BattleAttackerCollector(
   thread,
@@ -19,6 +20,7 @@ async function BattleAttackerCollector(
 
   let currentCard = undefined;
   currentAttacker === user1 ? (currentCard = cardA) : (currentCard = cardB);
+  console.log(currentCard.skill1);
 
   return new Promise((resolve) => {
     const collector = thread.createMessageComponentCollector({
@@ -31,6 +33,26 @@ async function BattleAttackerCollector(
     let lastMessageId = null;
 
     collector.on("collect", async (interaction) => {
+      const battleButtons = await ButtonView.BattleButtons();
+      const skillsButtons = await ButtonView.BattleSkillsButtons(
+        currentCard.skill1,
+        currentCard.skill2
+      );
+      // check attackers mana before render button
+      const attackerManaStatus = currentCard.currentMANA;
+
+      const checkManaStatus = await skillRenderHandler.checkManaStatus(
+        attackerManaStatus,
+        currentCard.skill1,
+        currentCard.skill2
+      );
+      const SkillButtonRender = await skillRenderHandler.SkillButtonRender(
+        checkManaStatus,
+        skillsButtons
+      );
+      const confirmButton = battleButtons.confirmActionRow;
+      const cancelButton = battleButtons.cancelActionRow;
+
       let interactionID = interaction.message.id;
       if (
         !interaction.customId.startsWith("confirm") &&
@@ -43,20 +65,13 @@ async function BattleAttackerCollector(
         resolve(defensorName);
         return;
       }
-      const battleButtons = await ButtonView.BattleButtons();
-      const skillsButtons = await ButtonView.BattleSkillsButtons(
-        currentCard.skill1,
-        currentCard.skill2
-      );
-      const confirmButton = battleButtons.confirmActionRow;
-      const cancelButton = battleButtons.cancelActionRow;
 
       //chamar botão de confimação
       if (interaction.customId === "skillList") {
         const newMessage = await interaction.update({
           content: `# Skills:`,
           embeds: [attackerEmbed],
-          components: [skillsButtons],
+          components: [SkillButtonRender],
           fetchReply: true,
         });
         lastMessageId = newMessage.id;
@@ -73,7 +88,7 @@ async function BattleAttackerCollector(
         });
         return;
       }
-      
+
       lastMessageId = interaction.message.id;
 
       if (confirmed) {
@@ -91,16 +106,13 @@ async function BattleAttackerCollector(
           components: [confirmButton],
         });
         return;
-      }
-      else
-      {
+      } else {
         await interaction.update({
           content: `# Deseja confimar ação?`,
           embeds: [attackerEmbed],
           components: [confirmButton, cancelButton],
         });
       }
-     
 
       // criar uma função para lidar com a confirmação
       const confirmCollector = thread.createMessageComponentCollector({
@@ -114,7 +126,6 @@ async function BattleAttackerCollector(
           confirmCollector.stop();
           collector.stop();
           alreadyCanceled = false;
-          alreadyBack = false;
           confirmed = true;
         } else if (i.customId === "cancel") {
           // get interaction by id
@@ -122,11 +133,12 @@ async function BattleAttackerCollector(
             .fetch(interactionID, { force: true })
             .then((msg) => msg.delete())
             .catch(console.error);
-          await interaction.followUp({
-            content: `# Ação cancelada!`,
-            embeds: [attackerEmbed],
-            components: [battleButtons.actionRow],
-          });
+          await skillRenderHandler.CancelActionSkillRender(
+            SkillButtonRender,
+            i,
+            attackerEmbed,
+            battleButtons
+          );
           alreadyCanceled = true;
           confirmed = false;
           confirmCollector.stop();
@@ -253,7 +265,6 @@ async function BattleDefensorCollector(
           embeds: [defensorEmbed],
           components: [confirmButton],
         });
-        return;
       } else {
         await interaction.update({
           content: `# Deseja confimar ação?`,

@@ -137,6 +137,29 @@ module.exports = class ButtonController {
         .setLabel(`Desistir`)
         .setStyle(ButtonStyle.Secondary)
     );
+    const actionRowSkillDisabled = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("attack")
+        .setLabel(`Atacar`)
+        .setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId("defend")
+        .setLabel(`Defender`)
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("dodge")
+        .setLabel(`Esquivar`)
+        .setStyle(ButtonStyle.Primary),
+      new ButtonBuilder()
+        .setCustomId("skillList")
+        .setLabel(`Skills`)
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(true),
+      new ButtonBuilder()
+        .setCustomId("forfeit")
+        .setLabel(`Desistir`)
+        .setStyle(ButtonStyle.Secondary)
+    );
     const confirmActionRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("confirm")
@@ -150,11 +173,11 @@ module.exports = class ButtonController {
         .setStyle(ButtonStyle.Danger)
     );
 
-    return { actionRow, confirmActionRow, cancelActionRow };
+    return { actionRow, actionRowSkillDisabled, confirmActionRow, cancelActionRow };
   }
   static async BattleSkillsButtons(skill1, skill2)
   {
-    const skillListRow = new ActionRowBuilder().addComponents(
+    const bothSkillsRow = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId(`skill1`)
         .setLabel(`${skill1.name}`)
@@ -164,6 +187,18 @@ module.exports = class ButtonController {
         .setLabel(`${skill2.name}`)
         .setStyle(ButtonStyle.Success),
     );
-    return skillListRow;
+    const singleSkillRow1 = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`skill1`)
+        .setLabel(`${skill1.name}`)
+        .setStyle(ButtonStyle.Success),
+    );
+    const singleSkillRow2 = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`skill2`)
+        .setLabel(`${skill2.name}`)
+        .setStyle(ButtonStyle.Success),
+    );
+    return {bothSkillsRow, singleSkillRow1, singleSkillRow2};
   }
 };
